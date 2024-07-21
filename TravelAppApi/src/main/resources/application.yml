@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    # Specify JDBC url that connects to Postgres db
+    url: jdbc:postgresql://localhost:5432/postgres
+    # Credentials for database user; wrap them in quotes so nothing goes wrong with parsing the credentials
+    username: "postgres"
+    password: "07032004"
+    # Full name of Postgres JDBC driver class
+    driver-class-name: org.postgresql.Driver
+  redis:
+    host: redis
+    port: 6379
+  session:
+    store-type: redis
+    # Flush Mode: Flushing refers to the process of saving or updating session data
+    # that's in our Redis store. From our application to the session store.
+    # 'immediate': Sessions are flushed (updated) to Redis after each request. On every change, which keeps things up to date, but may be very expensive.
+    # 'on-save': Flushed (update) only when there are changes and the session is explicitly saved or invalidated; generally this is the default
+    # 'on-session-creation': Flushing only occurs when new session is created; so we only send the session data to redis when we create it.
+    redis:
+      flush-mode: on-save
+  jpa:
+    hibernate:
+      # At startup, we'll always have a clean database
+      ddl-auto: create-drop
+      # By default Hibernate converts entity attribute names from camelCase to snake_case when creating the columns in your database tables.
+      # For example, a Java field 'firstName' becomes 'first_name' in the database. Here's how to change this behavior and get more control:
+      # physical-strategy: Customizes how Hibernate translates entity attribute names to our  physical database names (columns.
+      # By using 'PhysicalNamingStrategyStandardImpl', we just pass names through, respecting the casing and leaving things unaltered.
+      # implicit-strategy: Determines how Hibernate generates names for database OBJECT names based on the entity attribute names
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+    # Let hibernate show the sql output
+    show-sql: false
+    properties:
+      hibernate:
+        # If we output sql, then format them to be human-readable; useful when 'show-sql' is enabled.
+        format_sql: true
+    # Specify that we're connecting to a Postgres database; SpringBoot will use this for configurations
+    database: postgresql
+    # Sets the Hibernate dialect to use; tells Hibernate how to generate optimized SQL for Postgres
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

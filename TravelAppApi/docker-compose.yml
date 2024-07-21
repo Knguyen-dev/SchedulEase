@@ -1,0 +1,37 @@
+services:
+
+  # So this will contain our main database and redis we'll use in production.
+
+  # Redis instance
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  # A Postgres
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: myUser
+      POSTGRES_PASSWORD: myPassword
+      POSTGRES_DB: myDatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+# Name volumes that Docker manages for persisting data; docker will handle the management of the directory and management for us.
+volumes:
+
+  # Using volumes we can persist PostgreSQL across the starting and stopping of the container!
+  # When we stop containers, we'd still be able to store the PostgreSQL data. When we stop containers, the named volume stays intact on our host machine.
+  # While we can't directly see the data stored in the volume, we can inspect the data still by going in its shell.
+  # We will leave it empty as we don't need any additional configurations.
+  postgres_data:
+
+
+
+
