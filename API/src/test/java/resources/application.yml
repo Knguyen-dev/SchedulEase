@@ -1,0 +1,20 @@
+spring:
+  # In-memory PostgreSQL database setup
+  datasource:
+    urL: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+  # Redis for our testing mode
+  redis:
+    host: redis
+    port: 6380
+  session:
+    store-type: redis
+    redis:
+      flush-mode: on-save
+

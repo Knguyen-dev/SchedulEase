@@ -1,0 +1,22 @@
+services:
+
+  # So this will contain our main database and redis we'll use in production.
+
+  # Redis instance
+  redis:
+    image: redis:7.4-rc2-alpine
+    container_name: api-redis
+    ports:
+      - "6379:6379"
+
+  # A Postgres
+  postgres:
+    image: postgres:16.3-alpine3.20
+    container_name: api-postgres
+    environment:
+      POSTGRES_USER: myUser
+      POSTGRES_PASSWORD: myPassword
+      POSTGRES_DB: myDatabase
+    ports:
+      - "5432:5432"
+
