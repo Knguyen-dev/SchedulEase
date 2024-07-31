@@ -1,4 +1,4 @@
-package com.knguyendev.api.domain.dto.user.constraints;
+package com.knguyendev.api.domain.dto.User.constraints;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

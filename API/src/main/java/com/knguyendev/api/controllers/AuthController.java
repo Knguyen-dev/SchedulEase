@@ -1,7 +1,7 @@
 package com.knguyendev.api.controllers;
 
-import com.knguyendev.api.domain.dto.user.UserDTO;
-import com.knguyendev.api.domain.dto.user.UserRegistrationDTO;
+import com.knguyendev.api.domain.dto.User.UserDTO;
+import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
 import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.mappers.Mapper;
 import com.knguyendev.api.services.UserService;
@@ -24,10 +24,8 @@ public class AuthController {
 
     // Setting up to receive beans for UserService and Mapper<UserEntity, UserDto>
     private UserService userService;
-    private Mapper<UserEntity, UserDTO> userMapper;
-    public AuthController(UserService userService, Mapper<UserEntity, UserDTO> userMapper) {
+    public AuthController(UserService userService) {
         this.userService = userService;
-        this.userMapper = userMapper;
     }
 
 

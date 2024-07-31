@@ -1,4 +1,4 @@
-package com.knguyendev.api.domain.dto.user;
+package com.knguyendev.api.domain.dto.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

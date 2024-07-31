@@ -11,7 +11,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 /**
  * Class that redirects 'AuthenticationException' exceptions to our ControllerAdvice class
  */
-@Component
+@Component(value="customAuthEntryPoint")
 public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
     /**

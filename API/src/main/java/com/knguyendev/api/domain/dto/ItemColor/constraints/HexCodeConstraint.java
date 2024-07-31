@@ -1,4 +1,4 @@
-package com.knguyendev.api.domain.dto.user.constraints;
+package com.knguyendev.api.domain.dto.ItemColor.constraints;
 
 
 import jakarta.validation.Constraint;
@@ -11,17 +11,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 @Constraint(validatedBy={})
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@NotNull
+@NotNull(message="Hex code for the color is required!")
 @Pattern(
-        regexp="^[A-Za-z]{1,32}$",
-        message="Your last name should be 1 to 32 characters, and only contain letters!"
+        regexp="^#[a-fA-F0-9]{6}$",
+        message="Please enter a valid 6 digit hexadecimal code in the form '#xxxxxx'!"
 )
-public @interface LastNameConstraint {
-    String message() default "Invalid last name (default message)!";
+public @interface HexCodeConstraint {
+    String message() default "Invalid hex code (default message)!";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

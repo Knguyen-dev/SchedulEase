@@ -63,6 +63,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(exceptionDetails, HttpStatus.BAD_REQUEST);
     }
 
+
+
+
     // Handles any 'AuthenticationException' exceptions
     @ExceptionHandler(value = {AuthenticationException.class})
     public ResponseEntity<ExceptionDetails> handleAuthenticationException(AuthenticationException e) {

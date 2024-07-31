@@ -1,8 +1,11 @@
 package com.knguyendev.api.services;
 
 
-import com.knguyendev.api.domain.dto.user.UserRegistrationDTO;
+import com.knguyendev.api.domain.dto.User.UserDTO;
+import com.knguyendev.api.domain.dto.User.UserLoginDTO;
+import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
 import com.knguyendev.api.domain.entities.UserEntity;
+import com.knguyendev.api.enumeration.UserRole;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,31 +19,27 @@ import java.util.Optional;
  */
 public interface UserService {
 
+    /**
+     * Service function used to create a new user in the database
+     *
+     * @param userRegistrationDTO Data that user inputted in order to create an account. Data is assumed to be normalized and validated for constraints before being passed into this function.
+     * @param role The role that the user registered is being registered for.
+     * @return Will return a UserEntity of the user whose account has been created.
+     */
+    UserDTO registerUser(UserRegistrationDTO userRegistrationDTO, UserRole role);
 
-    UserEntity save(UserEntity userEntity);
-    Optional<UserEntity> findByUsername(String username);
-    Optional<UserEntity> findByEmail(String email);
+    // finding/reading
+    UserDTO findByUsername(String username);
 
-    Optional<UserEntity> findByUsernameOrEmail(String username, String email);
+
+    // UserDTO loginUser(UserLoginDTO userLoginDTO);
+
 
 
     void deleteById(Long id);
+    // updating; A service function to update a user's profile
 
-    /**
-     * Attempts to fetch a user by their email and plaintext password
-     *
-     * @param email - Email of the user
-     * @param password - A plaintext version of their password
-     * @return Optional<UserEntity>
-     */
-    Optional<UserEntity> findByEmailAndPassword(String email, String password);
-
-
-    List<UserEntity> findAll();
-
-
-    UserEntity registerUser(UserRegistrationDTO userRegistrationDTO);
-
+    // UserDTO updateProfile();
 
 
 }

@@ -1,12 +1,21 @@
 package com.knguyendev.api.services.impl;
 
 
-import com.knguyendev.api.domain.dto.user.UserRegistrationDTO;
+import com.knguyendev.api.domain.dto.User.UserDTO;
+import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
 import com.knguyendev.api.domain.entities.UserEntity;
+import com.knguyendev.api.enumeration.UserRole;
+import com.knguyendev.api.exception.ServiceException;
+import com.knguyendev.api.mappers.UserMapper;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,92 +27,50 @@ import java.util.stream.StreamSupport;
  */
 @Service
 public class UserServiceImpl implements UserService {
-
-    // Set up our private properties and accept beans from Spring Context
     private final UserRepository userRepository;
-    public UserServiceImpl(UserRepository userRepository) {
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Persists a UserEntity into the database.
-     *
-     * @param userEntity - A user entity
-     * @return UserEntity
-     */
     @Override
-    public UserEntity save(UserEntity userEntity) {
-        return userRepository.save(userEntity);
+    public UserDTO registerUser(UserRegistrationDTO userRegistrationDTO, UserRole role) throws ServiceException {
+        // Ensure email and username are unique; query for a user where the username or email matches.
+        Optional<UserEntity> result = userRepository.findByUsernameOrEmail(
+                userRegistrationDTO.getUsername(),
+                userRegistrationDTO.getEmail()
+        );
+        if (result.isPresent()) {
+            UserEntity existingUser = result.get();
+            if (existingUser.getUsername().equals(userRegistrationDTO.getUsername())) {
+                throw new ServiceException("Username is already taken!", HttpStatus.BAD_REQUEST);
+            } else {
+                throw new ServiceException("Email is already in use!", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Convert into an entity, apply the role, password hash, and creation time before saving it to the database
+        UserEntity newUser = userMapper.toEntity(userRegistrationDTO);
+        newUser.setRole(role);
+        newUser.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
+        newUser.setCreatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
+        return userMapper.toDTO(userRepository.save(newUser));
     }
 
-    public Optional<UserEntity> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    @Override
+    public UserDTO findByUsername(String username) throws ServiceException {
+        Optional<UserEntity> result = userRepository.findByUsername(username);
+        if (result.isEmpty()) {
+            throw new ServiceException("A user with the username '" + username + "' wasn't found!", HttpStatus.NOT_FOUND);
+        }
+        return userMapper.toDTO(result.get());
     }
 
-    public Optional<UserEntity> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    public Optional<UserEntity> findByEmailAndPassword(String email, String password) {
-        return userRepository.findByEmailAndPassword(email, password);
-    }
-
+    // Deleting
     public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
-
-    public List<UserEntity> findAll() {
-        return StreamSupport.stream(userRepository.findAll().spliterator(), false).collect(Collectors.toList());
-    }
-
-    /**
-     * @param userRegistrationDTO DTO containing all of the data needed to register a new user. Note that data was only been validated
-     *                            to meet basic constraints. We still need to transform the data such as lowercasing username
-     *                            and email. Also trimming the whitespace off of the data! As well as this we need to do
-     *                            checks to see if our lower-cased username or email correspond with an already existing user.
-     * @return Will return a UserEntity
-     */
-    @Override
-    public UserEntity registerUser(UserRegistrationDTO userRegistrationDTO) {
-
-
-
-
-
-
-        // Check if
-
-
-        return null;
-    }
-
-    public Optional<UserEntity> findByUsernameOrEmail(String username, String email) {
-        return userRepository.findByUsernameOrEmail(username, email);
-    }
-
-
-    /**
-     *
-     *
-     * @param username - Username of the account we're attempting to create. This hasn't be lowercased yet, so we'll lowercase it in this function
-     * @param firstName -
-     * @param lastName -
-     * @param biography -
-     * @param email -
-     * @param password -
-     * @return Would either throw an error or returns a UserEntity
-     */
-
-//    public Optional<UserEntity> registerUser(String username, String firstName, String lastName, String biography, String email, String password) {
-
-
-
-        // If username already taken, we gotta throw an error (4xx)
-
-        // If email already taken, we also gotta throw an error (4xx)
-
-        // Create a user entity now and return it
-//    }
-
-
 }

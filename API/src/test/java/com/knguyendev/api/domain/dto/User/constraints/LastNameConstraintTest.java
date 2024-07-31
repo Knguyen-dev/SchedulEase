@@ -1,4 +1,4 @@
-package com.knguyendev.api.domain.dto.user.constraints;
+package com.knguyendev.api.domain.dto.User.constraints;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,12 +10,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FirstNameConstraintTest {
+public class LastNameConstraintTest {
     private Validator validator;
+
     private static class TestDTO {
-        @FirstNameConstraint
-        String firstName;
+        @LastNameConstraint
+        String lastName;
     }
+
     @BeforeEach()
     void setup() {
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
@@ -24,29 +26,29 @@ public class FirstNameConstraintTest {
     }
 
     @Test
-    void whenValidFirstNameThenNoViolations() {
-        String[] validFirstNames = {
+    void whenValidLastNameNoViolations() {
+        String[] validLastNames = {
                 "Johnson",      // Upper and lower case
                 "May",          // Upper case only
                 "lowercased",   // Lowercase only
                 "m",            // minimum length
                 "a".repeat(32), // max length
         };
-        for (String firstName: validFirstNames) {
+        for (String lastName: validLastNames) {
             TestDTO testDTO = new TestDTO();
-            testDTO.firstName = firstName;
+            testDTO.lastName = lastName;
             Set<ConstraintViolation<TestDTO>> violations = validator.validate(testDTO);
             assertThat(violations)
-                    .withFailMessage("first name '%s' should be valid. Violations: %s", firstName, violations.stream().map(v -> String.format("Field: '%s', Message: '%s'",
-                                    v.getPropertyPath(), v.getMessage()))
-                            .collect(Collectors.toList()))
+                    .withFailMessage("Last name '%s' should be valid. Violations: %s", lastName, violations.stream().map(v -> String.format("Field: '%s', Message: '%s'",
+                            v.getPropertyPath(), v.getMessage()))
+                    .collect(Collectors.toList()))
                     .isEmpty();
         }
     }
 
     @Test
-    void whenInvalidFirstNamesThenViolations() {
-        String[] invalidFirstNames = {
+    void whenInvalidLastNameViolations() {
+        String[] invalidLastNames = {
                 "",                   // Empty string
                 "   ",                // Just white space
                 null,                 // Null value
@@ -55,15 +57,13 @@ public class FirstNameConstraintTest {
                 "A%l*ngton$",          // Has special characters
                 "a".repeat(33) // Has 33 characters (exceeds limit of 32)
         };
-        for (String firstName: invalidFirstNames) {
+        for (String lastName: invalidLastNames) {
             TestDTO testDTO = new TestDTO();
-            testDTO.firstName = firstName;
+            testDTO.lastName = lastName;
             Set<ConstraintViolation<TestDTO>> violations = validator.validate(testDTO);
             assertThat(violations)
-                    .withFailMessage("Expected violations for first name: '%s'.", firstName)
+                    .withFailMessage("Expected violations for last name: '%s'.", lastName)
                     .isNotEmpty();
         }
-
-
     }
 }

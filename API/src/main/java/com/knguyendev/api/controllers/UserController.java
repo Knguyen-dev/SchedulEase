@@ -1,6 +1,6 @@
 package com.knguyendev.api.controllers;
 
-import com.knguyendev.api.domain.dto.user.UserDTO;
+import com.knguyendev.api.domain.dto.User.UserDTO;
 import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.mappers.Mapper;
 import com.knguyendev.api.services.UserService;

@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-public class UserRepositoryIntegrationTests {
+public class UserRepositoryIT {
 
     private final UserRepository underTest;
 
@@ -38,7 +38,7 @@ public class UserRepositoryIntegrationTests {
      * to run as expected.
      */
     @Autowired
-    public UserRepositoryIntegrationTests(UserRepository underTest) {
+    public UserRepositoryIT(UserRepository underTest) {
         this.underTest = underTest;
     }
 

@@ -1,9 +1,9 @@
 package com.knguyendev.api.mappers.impl;
 
-
-import com.knguyendev.api.domain.dto.user.UserDTO;
+import com.knguyendev.api.domain.dto.User.UserDTO;
+import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
 import com.knguyendev.api.domain.entities.UserEntity;
-import com.knguyendev.api.mappers.Mapper;
+import com.knguyendev.api.mappers.UserMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -13,21 +13,21 @@ import org.springframework.stereotype.Component;
  * UserEntity and UserDto classes.
  */
 @Component
-public class UserMapperImpl implements Mapper<UserEntity, UserDTO> {
+public class UserMapperImpl implements UserMapper {
 
     // ModelMapper bean should be created in our config package
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     public UserMapperImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public UserDTO mapTo(UserEntity userEntity) {
-        return modelMapper.map(userEntity, UserDTO.class);
+    public UserEntity toEntity(UserRegistrationDTO userRegistrationDTO) {
+        return modelMapper.map(userRegistrationDTO, UserEntity.class);
     }
 
     @Override
-    public UserEntity mapFrom(UserDTO userDto) {
-        return modelMapper.map(userDto, UserEntity.class);
+    public UserDTO toDTO(UserEntity userEntity) {
+        return modelMapper.map(userEntity, UserDTO.class);
     }
 }

@@ -1,4 +1,5 @@
 package com.knguyendev.api.exception;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -20,14 +21,11 @@ import org.springframework.http.HttpStatus;
  *
  * @see RuntimeException
  */
+@Getter
 public class ServiceException extends RuntimeException {
     private HttpStatus httpStatus;
     public ServiceException(String message, HttpStatus httpStatus) {
         super(message);
         this.httpStatus = httpStatus;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
     }
 }

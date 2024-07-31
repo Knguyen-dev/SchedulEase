@@ -4,7 +4,7 @@ spring:
   custom:
 
     # Maximum number of session is going to be 1.
-    maxSessions: 1
+    maxSession: 1
 
 
   datasource:

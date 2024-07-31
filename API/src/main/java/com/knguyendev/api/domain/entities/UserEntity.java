@@ -1,26 +1,30 @@
 package com.knguyendev.api.domain.entities;
 
+import com.knguyendev.api.enumeration.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
+
 
 /**
  * Create a User entity:
  * Here we define the schema for our table. On startup, we should generate a table.
- *
- * We used 'columnDefinition' to more easily control the constraints and information about a column. We also defined
- * the name for each column when it gets generated to give us more control.
  */
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name="users")
+@Table(name="AppUser")
 public class UserEntity {
 
     @Id
@@ -36,10 +40,6 @@ public class UserEntity {
     @Column(name="lastName", columnDefinition="VARCHAR(64) NOT NULL")
     private String lastName;
 
-    /*
-    Remember that in java 'string' and 'String' are different. The latter
-    which is capitalized 'String' can hold null as a valid value.
-    */
     @Column(name="biography", columnDefinition="VARCHAR(150)")
     private String biography;
 
@@ -70,6 +70,37 @@ public class UserEntity {
 
     @Column(name="createdAt", columnDefinition="TIMESTAMPTZ NOT NULL")
     private ZonedDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="role", nullable=false)
+    private UserRole role;
+
+
+    /**
+     * Function for returning the authorities associated with a user
+     * @return An immutable set that contains the single authority/role associated with the user.
+     */
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(new SimpleGrantedAuthority(role.name()));
+    }
+
+    /**
+     * Custom method to see if two UserEntities are equal.
+     *
+     * 1. If memory address references are equal, then it's the same user.
+     * 2. If the object is null or of a different class, then it's not the same user.
+     * 3. If the ID values are equal, then it's the same user since IDs are unique.
+     *
+     * @param o Object assumed to be a UserEntity
+     * @return Boolean indicating whether two UserEntity objects are the same user
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(id, that.id);
+    }
 }
 
 

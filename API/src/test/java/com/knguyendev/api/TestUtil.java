@@ -1,7 +1,9 @@
 package com.knguyendev.api;
 
-import com.knguyendev.api.domain.dto.user.UserRegistrationDTO;
+import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
+import com.knguyendev.api.domain.entities.ItemColorEntity;
 import com.knguyendev.api.domain.entities.UserEntity;
+import com.knguyendev.api.enumeration.UserRole;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.ZoneId;
@@ -24,9 +26,6 @@ public class TestUtil {
      * 6. createdAt: This field can't be null. So here we'll put a ISO format 8601 date string
      * that's in zulu time. For pretend data, you can realistically any date-string utc here.
      * Though at least one example where we get the current time as a UTC date string would be great for reference.
-     *
-     *
-     *
      */
     public static UserEntity createTestUserA() {
         String plaintextPassword = "P$ssword_123";
@@ -43,6 +42,7 @@ public class TestUtil {
                 .isVerified(true)
                 .password(encryptedPassword)
                 .createdAt(createdAt)
+                .role(UserRole.USER)
                 .build();
     }
 
@@ -65,6 +65,7 @@ public class TestUtil {
                 .isVerified(false)
                 .password(encryptedPassword)
                 .createdAt(createdAt)
+                .role(UserRole.ADMIN)
                 .build();
     }
 
@@ -72,6 +73,23 @@ public class TestUtil {
             return UserRegistrationDTO
                     .builder()
                     .build();
+    }
+
+
+    public static ItemColorEntity createTestItemColorA() {
+        return ItemColorEntity.builder()
+                .id(1L) // Assuming ID is auto-generated or set manually
+                .name("Sky Blue")
+                .hexCode("#87CEEB")
+                .build();
+    }
+
+    public static ItemColorEntity createTestItemColorB() {
+        return ItemColorEntity.builder()
+                .id(2L) // Assuming ID is auto-generated or set manually
+                .name("Coral")
+                .hexCode("#FF7F50")
+                .build();
     }
 
 
