@@ -29,7 +29,7 @@ public class UserLoginDTO {
          * touch is password inputs.
          *
          * 1. In some systems, passwords can include spaces, and trimming it could mess up with user. In our case, we don't allow spaces.
-         * 2. Modifying the password in a user's attempt to login, or even sign up, will mess up their login later and can lead to security concerns.
+         * 2. Modifying the password in a user's attempt to log in, or even sign up, will mess up their login later and can lead to security concerns.
          * 
          */
         username = username.toLowerCase().trim();

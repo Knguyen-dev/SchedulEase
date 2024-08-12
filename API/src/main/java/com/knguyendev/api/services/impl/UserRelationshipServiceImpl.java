@@ -10,12 +10,12 @@ import com.knguyendev.api.repositories.UserRelationshipRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.UserRelationshipService;
 import com.knguyendev.api.utils.AuthUtils;
-import com.knguyendev.api.utils.ServiceUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.knguyendev.api.enumeration.UserRelationshipStatus.*;
@@ -27,28 +27,25 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     private final UserRelationshipRepository userRelationshipRepository;
     private final AuthUtils authUtils;
     private final UserRelationshipMapper userRelationshipMapper;
-    private final ServiceUtils serviceUtils;
     public UserRelationshipServiceImpl(
             UserRepository userRepository,
             UserRelationshipRepository userRelationshipRepository,
             AuthUtils authUtils,
-            UserRelationshipMapper userRelationshipMapper,
-            ServiceUtils serviceUtils
+            UserRelationshipMapper userRelationshipMapper
             ) {
         this.userRepository = userRepository;
         this.userRelationshipRepository = userRelationshipRepository;
         this.authUtils = authUtils;
         this.userRelationshipMapper = userRelationshipMapper;
-        this.serviceUtils = serviceUtils;
     }
 
 
     /**
      * Encapsulates two user IDs, ensuring that the IDs are ordered such that
      * the firstUserId is less than or equal to the secondUserId.
-     *
+     * <p>
      * NOTE: All of our service functions need to have the user IDS ordered as firstUserId and
-     * secondUserId. So to reduce repet
+     * secondUserId. So to reduce repeat
      */
     @Getter
     private static class UserRelationshipContext {
@@ -128,6 +125,11 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     public UserRelationshipDTO requestFriendship(Long targetUserId) {
         Long authUserId = authUtils.getAuthUserId();
         UserRelationshipContext relationshipContext = new UserRelationshipContext(authUserId, targetUserId, authUserId);
+
+        // Protect against the auth. user sending a friend request to themselves.
+        if (Objects.equals(authUserId, targetUserId)) {
+            throw new ServiceException("Can't send friend request to yourself!", HttpStatus.BAD_REQUEST);
+        }
 
         Optional<UserRelationshipEntity> relationshipResult = userRelationshipRepository.findByFirstUserIdAndSecondUserId(
                 relationshipContext.getFirstUserId(),
@@ -214,9 +216,12 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         Long authUserId = authUtils.getAuthUserId();
         UserRelationshipContext userRelationshipContext = new UserRelationshipContext(authUserId, targetUserId, authUserId);
 
+        if (authUserId.equals(targetUserId)) {
+            throw new ServiceException("You cannot accept a friend request from yourself.", HttpStatus.BAD_REQUEST);
+        }
+
         String notFoundErrMessage = "A pending friend request wasn't found!";
         String invalidBlockErrMessage = "You cannot accept this friend request since you're the one who sent it!";
-
 
         // Check if a UserRelationship even exists
         Optional<UserRelationshipEntity> relationshipResult = userRelationshipRepository.findByFirstUserIdAndSecondUserId(
@@ -272,9 +277,13 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         // Get authenticated user, set it up so that firstUserId < secondUserId
         Long authUserId = authUtils.getAuthUserId();
         UserRelationshipContext userRelationshipContext = new UserRelationshipContext(authUserId, targetUserId, authUserId);
-        String errMessage = "A pending friend request wasn't found!";
+
+        if (authUserId.equals(targetUserId)) {
+            throw new ServiceException("You cannot delete a friend request from yourself.", HttpStatus.BAD_REQUEST);
+        }
 
         // Check if a UserRelationship even exists
+        String errMessage = "A pending friend request wasn't found!";
         Optional<UserRelationshipEntity> relationshipResult = userRelationshipRepository.findByFirstUserIdAndSecondUserId(
                 userRelationshipContext.getFirstUserId(),
                 userRelationshipContext.getSecondUserId()
@@ -308,9 +317,13 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
         // Get authenticated user, set it up so that firstUserId < secondUserId
         Long authUserId = authUtils.getAuthUserId();
         UserRelationshipContext userRelationshipContext = new UserRelationshipContext(authUserId, targetUserId, authUserId);
-        String errMessage = "Friendship being deleted wasn't found!";
+
+        if (authUserId.equals(targetUserId)) {
+            throw new ServiceException("You cannot delete a friendship with yourself.", HttpStatus.BAD_REQUEST);
+        }
 
         // Check if a UserRelationship even exists
+        String errMessage = "Friendship being deleted wasn't found!";
         Optional<UserRelationshipEntity> relationshipResult = userRelationshipRepository.findByFirstUserIdAndSecondUserId(
                 userRelationshipContext.getFirstUserId(),
                 userRelationshipContext.getSecondUserId()
@@ -338,6 +351,10 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     public UserRelationshipDTO blockUser(Long targetUserId) {
         Long authUserId = authUtils.getAuthUserId();
         UserRelationshipContext userRelationshipContext = new UserRelationshipContext(authUserId, targetUserId, authUserId);
+
+        if (authUserId.equals(targetUserId)) {
+            throw new ServiceException("You cannot block yourself.", HttpStatus.BAD_REQUEST);
+        }
 
         /*
          * - Handling the existence of user relationships:
@@ -419,8 +436,12 @@ public class UserRelationshipServiceImpl implements UserRelationshipService {
     public UserRelationshipDTO unblockUser(Long targetUserId) {
         Long authUserId = authUtils.getAuthUserId();
         UserRelationshipContext userRelationshipContext = new UserRelationshipContext(authUserId, targetUserId, authUserId);
-        String errMessage = "You haven't blocked this user, so you can't unblock them!";
 
+        if (authUserId.equals(targetUserId)) {
+            throw new ServiceException("You cannot unblock yourself.", HttpStatus.BAD_REQUEST);
+        }
+
+        String errMessage = "You haven't blocked this user, so you can't unblock them!";
         Optional<UserRelationshipEntity> relationshipResult = userRelationshipRepository.findByFirstUserIdAndSecondUserId(
                 userRelationshipContext.getFirstUserId(),
                 userRelationshipContext.getSecondUserId()

@@ -27,6 +27,6 @@ public class ItemColorCreateDTO {
     // Trim the data, and lowercase the values. Lowercase them since both values are unique, and this ensures uniqueness
     public void normalizeData() {
         name = name.trim().toLowerCase();
-        hexCode = hexCode.toLowerCase(); // doesn't allow spaces so it doesn't need to be trimmed
+        hexCode = hexCode.toLowerCase(); // doesn't allow spaces, so it doesn't need to be trimmed
     }
 }

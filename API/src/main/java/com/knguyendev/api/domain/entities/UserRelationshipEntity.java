@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 /**
  * Represents a relationship between two users in the system.
  * The relationship is defined by two users and a status that indicates the nature of the relationship.
- *
+ * <p>
  * Design Considerations:
- *
+ * <p>
  * 1. Auto-Generated Primary Key:
  *    - An auto-generated primary key (`id`) is used to uniquely identify each `UserRelationshipEntity` record.
  *    - Pros:
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
  *      - Generally more efficient for indexing and querying compared to composite keys.
  *    - Cons:
  *      - Adds a column to the table which is only used for identification purposes.
- *
+ * <p>
  * Note: During the planning phase, the intention was to use a composite key based on `firstUserId` and `secondUserId`.
  *       However, due to challenges with managing composite keys, an auto-incrementing primary key was introduced.
  *       The current implementation does not use the primary key for most operations; it exists mainly for unique identification
@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
  *      - Maintains data integrity by enforcing uniqueness at the database level.
  *    - Cons:
  *      - Requires careful consideration of the uniqueness constraint to avoid conflicts in business logic.
- *
+ * <p>
  * 3. Enforcing Order with `firstUserId < secondUserId`:
  *    - The constraint that `firstUserId` must be less than `secondUserId` helps to ensure a consistent and
  *      non-redundant representation of relationships.
@@ -46,13 +46,13 @@ import lombok.NoArgsConstructor;
  *      - Simplifies querying and comparison of relationships.
  *    - Cons:
  *      - Requires additional logic to enforce the ordering constraint before persisting data.
- *
+ * <p>
  * Entity Definition:
  * - `id`: Auto-generated primary key for unique identification of each relationship.
  * - `firstUser`: Reference to the first user in the relationship.
  * - `secondUser`: Reference to the second user in the relationship.
  * - `status`: Status of the relationship.
- *
+ * <p>
  * Validation:
  * - The `validateUserIds` method ensures that `firstUserId` is less than `secondUserId`.
  * - Throws an `IllegalArgumentException` if the constraint is violated to maintain data integrity.

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -198,5 +199,36 @@ public class UserRelationshipRepositoryIT {
         // Assert
         assertThat(relationships.size()).isEqualTo(3);
         assertThat(relationships).containsExactlyInAnyOrder(relationshipAB, relationshipAC, relationshipAD);
+    }
+
+
+    @Test
+    @Transactional
+    public void testDeleteByUserId() {
+        // Arrange
+        UserEntity userA = TestUtil.createSavedUserA();
+        UserEntity userB = TestUtil.createSavedUserB();
+        UserEntity userC = TestUtil.createSavedUserC();
+        UserRelationshipEntity relationshipAB = UserRelationshipEntity.builder()
+                .firstUser(userA)
+                .secondUser(userB)
+                .status(UserRelationshipStatus.FRIENDS)
+                .build();
+        UserRelationshipEntity relationshipAC = UserRelationshipEntity.builder()
+                .firstUser(userA)
+                .secondUser(userC)
+                .status(UserRelationshipStatus.FRIENDS)
+                .build();
+
+        userRepository.save(userA);
+        userRepository.save(userB);
+        underTest.save(relationshipAB);
+        underTest.save(relationshipAC);
+
+        // Act: We're going to simulate the idea of deleting userA, so both relationships should no longer exist
+        underTest.deleteByUserId(userA.getId());
+
+        List<UserRelationshipEntity> relationships = underTest.findByUserId(userA.getId());
+        assertThat(relationships.size()).isEqualTo(0);
     }
 }

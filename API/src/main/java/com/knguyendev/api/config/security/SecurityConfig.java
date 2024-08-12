@@ -1,6 +1,5 @@
 package com.knguyendev.api.config.security;
 
-import com.knguyendev.api.services.LogoutService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -100,7 +98,7 @@ public class SecurityConfig {
     }
 
     /*
-     * A SecurityContextRepository implementation which the data of authenticated user in session when they login.
+     * A SecurityContextRepository implementation which the data of authenticated user in session when they log in.
      * More specifically it stores the security context in a HttpSession.
      *
      * With this, the SecurityContext holds the authentication/user's details, and that is also the data we store in the
@@ -116,7 +114,7 @@ public class SecurityConfig {
     /**
      * Method for creating a bean of the 'SecurityFilterChain', which is responsible for defining how we process requests
      * in our application.
-     * @param http Class that allows us to configure security settings for how we would deal with an http request.
+     * @param http Class that allows us to configure security settings for how we would deal with a http request.
      * @return A configured SecurityFilterChain bean
      * @throws Exception if any error occurs during the configuration of the chain.
      */

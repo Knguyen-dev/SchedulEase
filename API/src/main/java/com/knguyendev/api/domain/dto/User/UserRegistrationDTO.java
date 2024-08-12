@@ -33,13 +33,13 @@ public class UserRegistrationDTO {
 
     /**
      * This is to transform the data. For example, for usernames and emails we will lowercase them.
-     *
+     * <p>
      * - username: We believe usernames are duplicate even if they have different casing. E.g. 'SuperMan123' and 'superman123'
      * are the same username. We want to lowercase our usernames before we insert them into the database.
-     *
+     * <p>
      * - email: This is the same in the case of the latter. Like usernames, a given email can only be associated with one user
      * account. So emails 'SuperMan@hotmail.com' is the same as 'superman@hotmail.com'.
-     *
+     * <p>
      * - Other values and trimming: Due to our regex patterns, for usernames and emails, they won't be able to have spaces.
      * As well as this, firstName, lastName, and password are also the same as they can't contain spaces either. So we don't
      * have to worry about trimming spaces because if there are spaces in input then the error will receive an error that reminds

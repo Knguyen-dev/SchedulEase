@@ -10,19 +10,19 @@ import java.lang.annotation.*;
 /**
  * Custom annotation that defines the input validation rules for a user's
  * username. So we'll make a constraint 'bean'
- *
+ * <p>
  * NOTE: This does not check if a username is unique, rather that is done via a check at the
  * UserService implementation.
- *
+ * <p>
  *
  * + Explaining the annotations
- *
+ * <p>
  * 'Constraint':
  * - validatedBy: Specifies any 'validator' classes that validate elements annotated with annotation. Validators classes will contain the
- * validation logic, as they'll implement some 'isValid' method. Of course you can create your own validator class and it's pretty simple, but
- * we're not doing it in this case so we left it empty. The '@Pattern' annotation will be providing the validator
+ * validation logic, as they'll implement some 'isValid' method. Of course, you can create your own validator class, and it's pretty simple, but
+ * we're not doing it in this case, so we left it empty. The '@Pattern' annotation will be providing the validator
  * logic, so that handles things for us.
- *
+ * <p>
  * 'Target': This specifies where this annotation can be applied and used.
  * - 'ElementType.FIELD': Can be applied to fields of a class.
  * - 'ElementType.METHOD': Can be applied to class methods. So in the example below we're validating the return value. If
@@ -32,16 +32,16 @@ import java.lang.annotation.*;
  *       // Business logic to retrieve the username
  *       return "ValidUsername";
  *   }
- *
+ * <p>
  * - 'ElementType.PARAMETER': Can be applied to method parameters. You'd have to put the '@Validated' annotation on your
  * rest controller class to enable method-level validation. Here our 'UserConstraint' is being applied to the 'username'
  * parameter that we're getting in the controller function.
- *
+ * <p>
  * 1. Enabling method validation for a single class or controller in this case:
  * '@RestController'
  * '@Validated'
  * public class UserController {
- *      // Route to see if username is vlaid
+ *      // Route to see if username is valid
  *     '@GetMapping("/validateUsername")'
  *     public String validateUsername(
  *         '@RequestParam("username")' @UsernameConstraint String username) {
@@ -56,15 +56,15 @@ import java.lang.annotation.*;
  * }
  * In either case, when invalid input is provided to our 'validateUsername' route, Spring automatically handles the
  * validation error, and returns a '400 Bad Request' with the appropriate error message.
- *
+ * <p>
  * - 'ElementType.ANNOTATION_TYPE': Can be applied to other annotations (So you'd call this annotation a 'meta-annotation')
- *
+ * <p>
  * 'Retention(RetentionPolicy.RUNTIME)': Specifies how long we have to keep these annotations. So 'RUNTIME" just means
  * that the annotation should be available when the application runs, allowing frameworks like Spring to process it.
- *
+ * <p>
  * 'Pattern': A standard Java 'bean' Validation annotation. Basically it's used to validate that hte annotated string matches
  * the regular expression specified.
- *
+ * <p>
  * + Error response structure:
  * As briefly mentioned earlier, when using validation annotations in Spring Boot, any validation errors are automatically
  * handled and returned as part of the response. Spring boot sends a status '400 bad request', alongside some detailed error

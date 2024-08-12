@@ -11,11 +11,8 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +62,7 @@ public class AuthController {
 
 
     @GetMapping("/session")
-    public ResponseEntity<Map<String, Object>> printSessionAttributes(HttpSession session, Principal principal) {
+    public ResponseEntity<Map<String, Object>> printSessionAttributes(HttpSession session) {
         Map<String, Object> response = new HashMap<>();
 
         // Session details
@@ -76,9 +73,7 @@ public class AuthController {
 
         // Session attributes
         Map<String, Object> attributes = new HashMap<>();
-        session.getAttributeNames().asIterator().forEachRemaining(attributeName -> {
-            attributes.put(attributeName, session.getAttribute(attributeName));
-        });
+        session.getAttributeNames().asIterator().forEachRemaining(attributeName -> attributes.put(attributeName, session.getAttribute(attributeName)));
         response.put("Session Attributes", attributes);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

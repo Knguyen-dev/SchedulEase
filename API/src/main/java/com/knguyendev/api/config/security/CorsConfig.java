@@ -9,16 +9,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-
-
 /**
  * Configuration class for setting up and creating 'CorsConfigurationSource' bean, which is responsible
  * setting up the Cors configurations for our REST API.
- *
  * NOTE: This bean won't be used in the direct code that we create, but more so the library
  * code that we use. In our SecurityFilterChain we'll call the cors() method, and that's where
- * this 'CorsConfigurationSource' bean is used. Also the bean is automatically used by Spring Security
+ * this 'CorsConfigurationSource' bean is used. Also, the bean is automatically used by Spring Security,
  * so we don't need to explicitly reference or inject it anywhere.
  */
 @Configuration

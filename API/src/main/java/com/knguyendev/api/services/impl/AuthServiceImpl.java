@@ -159,7 +159,7 @@ public class AuthServiceImpl implements AuthService {
          * this it can lead to inconsistent session states when the user
          *
          * NOTE: This prevents the SecurityContext from becoming blank after a user logs in
-         * twice consecutively without logging out. Of course the user won't be able to login
+         * twice consecutively without logging out. Of course the user won't be able to log in
          * twice consecutively due to our conditional above.
          */
         HttpSession oldSession = request.getSession(false);

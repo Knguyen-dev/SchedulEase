@@ -1,37 +1,28 @@
 package com.knguyendev.api.mappers.impl;
 
 
+import com.knguyendev.api.domain.dto.ItemColor.ItemColorCreateDTO;
 import com.knguyendev.api.domain.dto.ItemColor.ItemColorDTO;
 import com.knguyendev.api.domain.entities.ItemColorEntity;
-import com.knguyendev.api.mappers.Mapper;
-import org.modelmapper.ModelMapper;
+import com.knguyendev.api.mappers.ItemColorMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ItemColorMapperImpl implements Mapper<ItemColorEntity, ItemColorDTO> {
-
-    // ModelMapper bean should be created in our config package
-    private final ModelMapper modelMapper;
-    public ItemColorMapperImpl(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
+public class ItemColorMapperImpl implements ItemColorMapper {
+    @Override
+    public ItemColorEntity toEntity(ItemColorCreateDTO dto) {
+        return ItemColorEntity.builder()
+                .name(dto.getName())
+                .hexCode(dto.getHexCode())
+                .build();
     }
 
-
-    /**
-     * @param itemColorEntity An entity object.
-     * @return A DTO version of ItemColor
-     */
     @Override
-    public ItemColorDTO mapTo(ItemColorEntity itemColorEntity) {
-        return modelMapper.map(itemColorEntity, ItemColorDTO.class);
-    }
-
-    /**
-     * @param itemColorDTO A DTO object.
-     * @return A domain object version of ItemColor
-     */
-    @Override
-    public ItemColorEntity mapFrom(ItemColorDTO itemColorDTO) {
-        return modelMapper.map(itemColorDTO, ItemColorEntity.class);
+    public ItemColorDTO toDTO(ItemColorEntity entity) {
+        return ItemColorDTO.builder()
+                .id(entity.getId())
+                .name(entity.getName())
+                .hexCode(entity.getHexCode())
+                .build();
     }
 }

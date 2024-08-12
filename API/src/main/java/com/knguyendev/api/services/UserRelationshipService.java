@@ -1,7 +1,6 @@
 package com.knguyendev.api.services;
 
 import com.knguyendev.api.domain.dto.UserRelationship.UserRelationshipDTO;
-import com.knguyendev.api.enumeration.UserRelationshipStatus;
 
 import java.util.List;
 
@@ -43,7 +42,7 @@ public interface UserRelationshipService {
     /**
      * Handles the process of deleting an existing friendship. This represents the scenario of simply removing someone from
      * your 'friends' list, which would be both of you not friends anymore.
-     * @param targetUserId Id of the other user that's referenced in the friendship.
+     * @param targetUserId ID of the other user that's referenced in the friendship.
      * @return A DTO representing the deleted friendship.
      */
      UserRelationshipDTO deleteFriendship(Long targetUserId);

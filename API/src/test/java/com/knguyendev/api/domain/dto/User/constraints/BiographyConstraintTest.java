@@ -28,7 +28,6 @@ public class BiographyConstraintTest {
     @Test
     void whenValidBiographyThenNoViolations() {
         String[] validBiographies = {
-                null,
                 "",                     // min length
                 "A sample biography",   // Some sample text
                 "a".repeat(150)   // max length

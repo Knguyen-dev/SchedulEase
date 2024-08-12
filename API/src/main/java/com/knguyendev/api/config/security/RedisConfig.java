@@ -12,7 +12,6 @@ import org.springframework.session.web.context.AbstractHttpSessionApplicationIni
 /**
  * Configuration class sets up Redis-based session management for the application. It creates a bean for the necessary
  * Redis connection factory and some session management components.
- *
  * NOTE: For flush, and other settings, you'd put it in the annotation
  */
 @Configuration

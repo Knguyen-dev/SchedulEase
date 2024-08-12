@@ -22,13 +22,13 @@ import java.util.Objects;
  * 1. **Session Storage**: When using Spring Session with Redis, session data—including the SecurityContext, which contains
  * UserDetails instances—needs to be serialized. Since UserDetails in turn contains UserEntity instances, UserEntity must
  * be serializable to be properly stored and retrieved from Redis.
- *
+ * <p>
  * 2. **Session Management**: Serialization allows session data to be consistently transferred between the server and Redis.
  * This ensures that the SecurityContext and its associated UserEntity data are preserved across different requests and server instances.
- *
+ * <p>
  * 3. **Local Server Storage**: Our session data is also going to be stored on the server as well, so our data needs to be
  * handled consistently.
- *
+ * <p>
  * By implementing Serializable, we make sure that UserEntity can be serialized for storage in Redis or other mechanisms
  * that require object serialization.
  */
@@ -69,7 +69,7 @@ public class UserEntity implements Serializable {
     @Column(name="verifyEmailToken", columnDefinition="CHAR(64)")
     private String verifyEmailToken;
 
-    // NOTE: 'TIMESTAMPTZ', the 'Z' at the end lets the column store time-zone info
+    // NOTE: 'TIMESTAMPTZ', the 'TZ' at the end lets the column store time-zone info
     @Column(name="verifyEmailTokenExpires", columnDefinition = "TIMESTAMP")
     private ZonedDateTime verifyEmailTokenExpires;
 
@@ -100,7 +100,7 @@ public class UserEntity implements Serializable {
 
     /**
      * Custom method to see if two UserEntities are equal.
-     *
+     * <p>
      * 1. If memory address references are equal, then it's the same user.
      * 2. If the object is null or of a different class, then it's not the same user.
      * 3. If the ID values are equal, then it's the same user since IDs are unique.

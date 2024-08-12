@@ -59,7 +59,7 @@ public interface UserService {
 
 
     /**
-     * Deletes a user via it's ID. More so used by admins as it allows admins to be able to delete the account of any
+     * Deletes a user via its ID. More so used by admins as it allows admins to be able to delete the account of any
      * other user. As well as this, there's builtin logic to prevent the authenticated user from deleting themselves since
      * this service doesn't handle logging out the user also.
      * @param id ID of the user
@@ -90,7 +90,7 @@ public interface UserService {
 
 
     /*
-     * We've yet to do this. It's not that important, as it moreso involves us connecting to SendGrid or some
+     * We've yet to do this. It's not that important, as it more so involves us connecting to SendGrid or some
      * other email api. I'd rather focus on other application logic since we've gotten the main auth-related stuff seemingly done.
      */
 

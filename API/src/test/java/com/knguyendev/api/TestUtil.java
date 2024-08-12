@@ -12,7 +12,6 @@ import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.domain.entities.UserRelationshipEntity;
 import com.knguyendev.api.enumeration.UserRelationshipStatus;
 import com.knguyendev.api.enumeration.UserRole;
-import com.knguyendev.api.mappers.impl.UserRelationshipMapperImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.ZoneId;

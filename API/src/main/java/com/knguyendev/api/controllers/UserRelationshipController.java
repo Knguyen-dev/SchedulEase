@@ -1,9 +1,7 @@
 package com.knguyendev.api.controllers;
 
-
 import com.knguyendev.api.domain.dto.UserRelationship.UserRelationshipDTO;
 import com.knguyendev.api.domain.dto.UserRelationship.UserRelationshipRequest;
-import com.knguyendev.api.domain.entities.UserRelationshipEntity;
 import com.knguyendev.api.services.UserRelationshipService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,50 +18,38 @@ public class UserRelationshipController {
         this.userRelationshipService = userRelationshipService;
     }
 
-     @PostMapping(path="/request")
-     public ResponseEntity<UserRelationshipDTO> requestFriendship(
-             @Valid @RequestBody UserRelationshipRequest relationshipRequest
-     ) {
+    @PostMapping(path="/request")
+    public ResponseEntity<UserRelationshipDTO> requestFriendship(@Valid @RequestBody UserRelationshipRequest relationshipRequest) {
          UserRelationshipDTO dto = userRelationshipService.requestFriendship(relationshipRequest.getTargetUserId());
          return new ResponseEntity<>(dto, HttpStatus.OK);
      }
 
     @PutMapping(path="/accept")
-    public ResponseEntity<UserRelationshipDTO> acceptFriendRequest(
-             @Valid @RequestBody UserRelationshipRequest relationshipRequest
-     ) {
+    public ResponseEntity<UserRelationshipDTO> acceptFriendRequest(@Valid @RequestBody UserRelationshipRequest relationshipRequest) {
         UserRelationshipDTO dto = userRelationshipService.acceptFriendRequest(relationshipRequest.getTargetUserId());
         return new ResponseEntity<>(dto, HttpStatus.OK);
      }
 
     @DeleteMapping(path="/request")
-    public ResponseEntity<UserRelationshipDTO> deleteFriendRequest(
-            @Valid @RequestBody UserRelationshipRequest relationshipRequest
-    ) {
+    public ResponseEntity<UserRelationshipDTO> deleteFriendRequest(@Valid @RequestBody UserRelationshipRequest relationshipRequest) {
         UserRelationshipDTO dto = userRelationshipService.deleteFriendRequest(relationshipRequest.getTargetUserId());
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @DeleteMapping(path="/friend")
-    public ResponseEntity<UserRelationshipDTO> deleteFriendship(
-            @Valid @RequestBody UserRelationshipRequest relationshipRequest
-    ) {
+    public ResponseEntity<UserRelationshipDTO> deleteFriendship(@Valid @RequestBody UserRelationshipRequest relationshipRequest) {
         UserRelationshipDTO dto = userRelationshipService.deleteFriendship(relationshipRequest.getTargetUserId());
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @PutMapping(path="/block")
-    public ResponseEntity<UserRelationshipDTO> blockUser(
-            @Valid @RequestBody UserRelationshipRequest relationshipRequest
-    ) {
+    public ResponseEntity<UserRelationshipDTO> blockUser(@Valid @RequestBody UserRelationshipRequest relationshipRequest) {
         UserRelationshipDTO dto = userRelationshipService.blockUser(relationshipRequest.getTargetUserId());
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @PutMapping(path="/unblock")
-    public ResponseEntity<UserRelationshipDTO> unblockUser(
-            @Valid @RequestBody UserRelationshipRequest relationshipRequest
-    ) {
+    public ResponseEntity<UserRelationshipDTO> unblockUser(@Valid @RequestBody UserRelationshipRequest relationshipRequest) {
         UserRelationshipDTO dto = userRelationshipService.unblockUser(relationshipRequest.getTargetUserId());
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }

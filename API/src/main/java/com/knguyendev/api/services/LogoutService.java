@@ -15,5 +15,5 @@ public interface LogoutService {
      * @param request Really useful for getting the session ID and managing invalidating the session.
      * @param response Very useful for deleting the session cookie that we placed in the user's browser.
      */
-    public void logout(HttpServletRequest request, HttpServletResponse response);
+    void logout(HttpServletRequest request, HttpServletResponse response);
 }

@@ -5,6 +5,7 @@ import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.enumeration.UserRole;
 import com.knguyendev.api.exception.ServiceException;
 import com.knguyendev.api.mappers.UserMapper;
+import com.knguyendev.api.repositories.UserRelationshipRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.LogoutService;
 import com.knguyendev.api.services.UserService;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.List;
@@ -24,18 +26,23 @@ import java.util.stream.StreamSupport;
 /**
  * Create a class that implements the UserService interface. So this class actually contains the implementation and code
  * for the methods and whatnot.
+ *
+ *
+ * NOTE: Now you need to include the deletion of UserRelationships when a User themselves is deleted
  */
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserRelationshipRepository userRelationshipRepository;
     private final UserMapper userMapper;
     private final LogoutService logoutService;
     private final PasswordEncoder passwordEncoder;
     private final AuthUtils authUtils;
     private final ServiceUtils serviceUtils;
 
-    public UserServiceImpl(UserRepository userRepository, LogoutService logoutService, UserMapper userMapper, PasswordEncoder passwordEncoder, AuthUtils authUtils, ServiceUtils serviceUtils) {
+    public UserServiceImpl(UserRepository userRepository, UserRelationshipRepository userRelationshipRepository, LogoutService logoutService, UserMapper userMapper, PasswordEncoder passwordEncoder, AuthUtils authUtils, ServiceUtils serviceUtils) {
         this.userRepository = userRepository;
+        this.userRelationshipRepository = userRelationshipRepository;
         this.logoutService = logoutService;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
@@ -115,6 +122,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDTO deleteAccount(HttpServletRequest request, HttpServletResponse response, UserDeleteDTO userDeleteDTO) {
         Long userId = authUtils.getAuthUserId();
         UserEntity user = serviceUtils.getUserById(userId);
@@ -135,6 +143,10 @@ public class UserServiceImpl implements UserService {
         // Password was correct, so delete user from the database and begin logout process
         // Delete user from the database, logout the user, and convert the deleted user into a DTO
         userRepository.deleteById(userId);
+
+        // Attempt to then delete all relationships associated with the user?
+        userRelationshipRepository.deleteByUserId(userId);
+
         logoutService.logout(request, response);
         return userMapper.toDTO(user);
     }
@@ -154,7 +166,7 @@ public class UserServiceImpl implements UserService {
         }
 
         /*
-         * If an admin is being deleted, we need to check if the requestor/authenticated user is a super admin. If they
+         * If an admin is being deleted, we need to check if the requester/authenticated user is a super admin. If they
          * aren't then we'll deny the request
          */
         if (user.getRole() == UserRole.ADMIN) {
@@ -164,7 +176,10 @@ public class UserServiceImpl implements UserService {
             }
         }
 
+        // Delete the user and any corresponding relationships
         userRepository.deleteById(id);
+        userRelationshipRepository.deleteByUserId(id);
+
         return userMapper.toDTO(user);
     }
 

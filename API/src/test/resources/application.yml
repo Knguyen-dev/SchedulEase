@@ -1,20 +1,39 @@
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation: DEBUG
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        name: "ScheduleEase-SessionID"
+      timeout: "15m"
 spring:
-  # In-memory PostgreSQL database setup
+  custom:
+    maxSession: 1
   datasource:
-        urL: "jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH"
-        username: "sa"
-        password: "password"
-        driver-class-name: org.h2.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-
-  # Redis for our testing mode
+    url: "jdbc:postgresql://localhost:5000/myDatabase"
+    username: "myUser"
+    password: "myPassword"
+    driver-class-name: org.postgresql.Driver
   redis:
-    host: redis
-    port: 6380
+    host: localhost
+    port: 6379
   session:
     store-type: redis
     redis:
       flush-mode: on-save
-
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

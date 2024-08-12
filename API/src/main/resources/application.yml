@@ -31,7 +31,7 @@ spring:
 
   datasource:
     # Specify JDBC url that connects to Postgres db
-    url: "jdbc:postgresql://localhost:5432/myDatabase"
+    url: "jdbc:postgresql://localhost:5000/myDatabase"
     # Credentials for database user; wrap them in quotes so nothing goes wrong with parsing the credentials
     username: "myUser"
     password: "myPassword"

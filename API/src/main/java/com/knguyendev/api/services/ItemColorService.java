@@ -2,11 +2,9 @@ package com.knguyendev.api.services;
 
 import com.knguyendev.api.domain.dto.ItemColor.ItemColorCreateDTO;
 import com.knguyendev.api.domain.dto.ItemColor.ItemColorDTO;
-import com.knguyendev.api.domain.entities.ItemColorEntity;
 import com.knguyendev.api.exception.ServiceException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ItemColorService {
 
