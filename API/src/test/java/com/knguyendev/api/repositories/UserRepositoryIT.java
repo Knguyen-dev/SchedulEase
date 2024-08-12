@@ -57,25 +57,37 @@ public class UserRepositoryIT {
     * */
     @Test
     public void testThatUserCanBeCreatedAndFound() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
         underTest.save(userA);
         Optional<UserEntity> result = underTest.findById(userA.getId());
         assertThat(result).isPresent();
         assertThat(result.get().getId()).isEqualTo(userA.getId());
     }
 
+
+    // Fails since we have that dbsetup thing setup. Later we'll remove it when our database is proper
     @Test
     public void testThatManyUsersCanBeCreatedAndFound() {
-        UserEntity userA = TestUtil.createTestUserA();
-        underTest.save(userA);
-        UserEntity userB = TestUtil.createTestUserB();
-        underTest.save(userB);
+        List<UserEntity> users = List.of(
+                TestUtil.createSavedUserA(),
+                TestUtil.createSavedUserB()
+        );
+
+        // Save all users
+        for (UserEntity user : users) {
+            underTest.save(user);
+        }
+
         Iterable<UserEntity> result = underTest.findAll();
         List<Long> userIds = StreamSupport.stream(result.spliterator(), false)
                         .map(UserEntity::getId)
                                 .toList();
+
+
         // Create a list of expected IDs
-        List<Long> expectedIds = List.of(userA.getId(), userB.getId());
+        List<Long> expectedIds = users.stream()
+                .map(UserEntity::getId)
+                .toList();
 
         // Assert that the actual IDs match the expected IDs
         assertThat(userIds)
@@ -86,7 +98,7 @@ public class UserRepositoryIT {
 
     @Test
     public void testThatUserCanBeUpdated() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
 
         // Insert it into database
         underTest.save(userA);
@@ -104,7 +116,7 @@ public class UserRepositoryIT {
 
     @Test
     public void testThatUserCanBeDeleted() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
 
         // Save and then delete UserEntity from the database
         underTest.save(userA);
@@ -117,7 +129,7 @@ public class UserRepositoryIT {
 
     @Test
     public void testFindByEmail() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
         underTest.save(userA);
         Optional<UserEntity> result = underTest.findByEmail(userA.getEmail());
         assertThat(result).isPresent();
@@ -126,7 +138,7 @@ public class UserRepositoryIT {
 
     @Test
     public void testFindByUsername() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
         underTest.save(userA);
         Optional<UserEntity> result = underTest.findByUsername(userA.getUsername());
         assertThat(result).isPresent();
@@ -135,7 +147,7 @@ public class UserRepositoryIT {
 
     @Test
     public void testFindByEmailAndPassword() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
         underTest.save(userA);
         Optional<UserEntity> result = underTest.findByEmailAndPassword(userA.getEmail(), userA.getPassword());
         assertThat(result).isPresent();
@@ -145,7 +157,7 @@ public class UserRepositoryIT {
 
     @Test
     public void testFindByUsernameOrEmail() {
-        UserEntity userA = TestUtil.createTestUserA();
+        UserEntity userA = TestUtil.createSavedUserA();
         underTest.save(userA);
 
         // Check that user can be found via a good username
@@ -160,6 +172,20 @@ public class UserRepositoryIT {
     }
 
 
+    @Test
+    public void testFindByIds() {
+        UserEntity userA = TestUtil.createSavedUserA();
+        UserEntity userB = TestUtil.createSavedUserB();
 
+        underTest.save(userA);
+        underTest.save(userB);
+
+        // Test the custom query
+        List<UserEntity> users = underTest.findByIds(List.of(userA.getId(), userB.getId()));
+
+        assertThat(users.size()).isEqualTo(2);
+        assertThat(users.get(0).getId()).isEqualTo(userA.getId());
+        assertThat(users.get(1).getId()).isEqualTo(userB.getId());
+    }
 
 }

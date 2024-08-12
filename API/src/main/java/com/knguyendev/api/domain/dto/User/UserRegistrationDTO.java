@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+
 /**
  * DTO or object that represents the information that the user will input when trying to register a user account.
  */
@@ -45,7 +46,7 @@ public class UserRegistrationDTO {
      * them of the input constraints.
      */
     public void normalizeData() {
-        username = username.trim().toLowerCase();
+        username = username.toLowerCase();
         email = email.toLowerCase();
     }
 }

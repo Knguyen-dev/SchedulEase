@@ -21,11 +21,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     /**
-     * Used by Spring Security to retrieve a user's information from a data source (databasein this case) based on their
+     * Used by Spring Security to retrieve a user's information from a data source (database in this case) based on their
      * username. It's typically used in the 'AuthenticationProvider' to validate a user's credential's.
      *
-     * @param username Username of the user
-     * @return Returns a 'UserDetails' instance representing the User.
+     * @param username Username of the user. This is the 'principal', the thing that identifies the user. You can see/change this in the login route.
+     * @return Returns a 'UserDetails' instance representing the User, which will be stored in the SecurityContext
      * @throws UsernameNotFoundException An exception thrown when the username didn't correlate to a User in the database.
      * This inherits from 'AuthenticationException'.
      */

@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy={})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@NotNull
+@NotNull(message="Password is required")
 @Pattern(
         regexp="^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])(?!.*\\s).{8,40}$",
         message="Password needs to be 8 to 40 characters, and must have one uppercase letter, lowercase letter, symbol, and one number."

@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy={})
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-@NotNull
+@NotNull(message="Last name is required!")
 @Pattern(
         regexp="^[A-Za-z]{1,32}$",
         message="Your last name should be 1 to 32 characters, and only contain letters!"

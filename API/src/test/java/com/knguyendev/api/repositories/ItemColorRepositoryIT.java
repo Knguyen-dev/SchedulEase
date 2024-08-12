@@ -26,7 +26,7 @@ public class ItemColorRepositoryIT {
 
     @Test
     public void testThatItemColorCanBeCreatedAndFound() {
-        ItemColorEntity itemColorA = TestUtil.createTestItemColorA();
+        ItemColorEntity itemColorA = TestUtil.createSavedItemColorA();
         underTest.save(itemColorA);
         Optional<ItemColorEntity> result = underTest.findById(itemColorA.getId());
         assertThat(result).isPresent();
@@ -35,8 +35,8 @@ public class ItemColorRepositoryIT {
 
     @Test
     public void testThatManyItemColorsCanBeCreatedAndFound() {
-        ItemColorEntity itemColorA = TestUtil.createTestItemColorA();
-        ItemColorEntity itemColorB = TestUtil.createTestItemColorB();
+        ItemColorEntity itemColorA = TestUtil.createSavedItemColorA();
+        ItemColorEntity itemColorB = TestUtil.createSavedItemColorB();
         underTest.save(itemColorA);
         underTest.save(itemColorB);
         Iterable<ItemColorEntity> result = underTest.findAll();
@@ -47,7 +47,7 @@ public class ItemColorRepositoryIT {
 
     @Test
     public void testThatItemColorCanBeDeleted() {
-        ItemColorEntity itemColorA = TestUtil.createTestItemColorA();
+        ItemColorEntity itemColorA = TestUtil.createSavedItemColorA();
         underTest.save(itemColorA);
         underTest.deleteById(itemColorA.getId());
         Optional<ItemColorEntity> result = underTest.findById(itemColorA.getId());
@@ -56,7 +56,7 @@ public class ItemColorRepositoryIT {
 
     @Test
     public void testThatItemColorCanBeUpdated() {
-        ItemColorEntity itemColorA = TestUtil.createTestItemColorA();
+        ItemColorEntity itemColorA = TestUtil.createSavedItemColorA();
         underTest.save(itemColorA);
         itemColorA.setName("New Color");
         underTest.save(itemColorA);
@@ -67,7 +67,7 @@ public class ItemColorRepositoryIT {
 
     @Test
     public void testFindByNameOrHexCode() {
-        ItemColorEntity itemColorA = TestUtil.createTestItemColorA();
+        ItemColorEntity itemColorA = TestUtil.createSavedItemColorA();
         underTest.save(itemColorA);
 
         // Check that ItemColor can be found via a good name
@@ -80,6 +80,5 @@ public class ItemColorRepositoryIT {
         assertThat(result2).isPresent();
         assertThat(result2.get()).isEqualTo(itemColorA);
     }
-
 
 }

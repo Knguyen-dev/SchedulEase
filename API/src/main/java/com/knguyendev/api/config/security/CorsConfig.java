@@ -29,7 +29,7 @@ public class CorsConfig {
         /*
          * 1. Set the allowed origins for the CORS requests.
          * 2. Allow any of the HTTP requests since it's a CRUD API. Also allow 'OPTIONS' to support preflight
-         * 3. Allow all headers, we don't want to replace restrictions on those.
+         * 3. Allow all headers, we don't want to replace restrictions on those; you may also just do only Content-Type header and 'X-CSRF' if you want.
          * 4. Allow cookies to be included in cross-origin requests. This allows browsers to include cookies in a request, and for the server to set cookies for the client
          */
         corsConfig.setAllowedOrigins(List.of("http://localhost:5173/"));

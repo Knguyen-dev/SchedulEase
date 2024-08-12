@@ -1,3 +1,25 @@
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation: DEBUG
+
+server:
+  # '8080' is the default
+  port: 8080
+
+  servlet:
+    session:
+      cookie:
+        # Control the name of the session cookie
+        name: "ScheduleEase-SessionID"
+
+      # Timeout: Sets the period of time the server will keep a session valid without any activity.
+      # If the user makes a request in this time period, then the timer resets. If it reaches 0, then the session is invalidated
+      # they have to log-in again. This timeout feature is how sessions usually work, and sessions won't always be active
+      # because users aren't usually on the site all day. Default is 30 minutes
+      timeout: "15m"
+
+
 spring:
 
   # Any custom configuration values go here
@@ -13,8 +35,10 @@ spring:
     # Credentials for database user; wrap them in quotes so nothing goes wrong with parsing the credentials
     username: "myUser"
     password: "myPassword"
+
     # Full name of Postgres JDBC driver class
     driver-class-name: org.postgresql.Driver
+
   redis:
     host: localhost
     port: 6379
@@ -32,12 +56,26 @@ spring:
     # timeout: "30m"
 
   jpa:
+
+    # open-in-view=true: The database connection stays open for the entire web request. This allows database entities
+    # to stay open for the entire web request. As a result we can access database entities and their lazy-loaded relationships
+    # (fetching related records only when needed) even in teh view or after our service layer.
+
+    # open-in-view=false: DB connection closes as soon as your service layer finishes processing. This means lazy-loaded
+    # entities must be fully loaded before the service layer returns. Spring will know it's a service layer function when
+    # annotated with '@Transaction'.
+
+    # Takeaway: We're going to keep this false. This frees up connections more quickly, and saves memory as we're loading
+    # data in a controlled manner. Also, this would encourage keeping database fetching stuff in the service layer, so we're
+    # going to stay like this.
+    open-in-view: false
+
     hibernate:
       # At startup, we'll always have a clean database
       ddl-auto: create-drop
-      # By default Hibernate converts entity attribute names from camelCase to snake_case when creating the columns in your database tables.
+      # By default, Hibernate converts entity attribute names from camelCase to snake_case when creating the columns in your database tables.
       # For example, a Java field 'firstName' becomes 'first_name' in the database. Here's how to change this behavior and get more control:
-      # physical-strategy: Customizes how Hibernate translates entity attribute names to our  physical database names (columns.
+      # physical-strategy: Customizes how Hibernate translates entity attribute names to our  physical database names (columns).
       # By using 'PhysicalNamingStrategyStandardImpl', we just pass names through, respecting the casing and leaving things unaltered.
       # implicit-strategy: Determines how Hibernate generates names for database OBJECT names based on the entity attribute names
       naming:

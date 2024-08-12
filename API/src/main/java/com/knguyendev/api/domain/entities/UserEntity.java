@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,16 +17,29 @@ import java.util.Objects;
 
 
 /**
- * Create a User entity:
- * Here we define the schema for our table. On startup, we should generate a table.
+ * The UserEntity class implements Serializable to ensure that instances can be converted to a byte stream (Basically a
+ * sequence of binary data). This is necessary for several reasons:
+ * 1. **Session Storage**: When using Spring Session with Redis, session data—including the SecurityContext, which contains
+ * UserDetails instances—needs to be serialized. Since UserDetails in turn contains UserEntity instances, UserEntity must
+ * be serializable to be properly stored and retrieved from Redis.
+ *
+ * 2. **Session Management**: Serialization allows session data to be consistently transferred between the server and Redis.
+ * This ensures that the SecurityContext and its associated UserEntity data are preserved across different requests and server instances.
+ *
+ * 3. **Local Server Storage**: Our session data is also going to be stored on the server as well, so our data needs to be
+ * handled consistently.
+ *
+ * By implementing Serializable, we make sure that UserEntity can be serialized for storage in Redis or other mechanisms
+ * that require object serialization.
  */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
 @Table(name="AppUser")
-public class UserEntity {
+public class UserEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -40,8 +54,8 @@ public class UserEntity {
     @Column(name="lastName", columnDefinition="VARCHAR(64) NOT NULL")
     private String lastName;
 
-    @Column(name="biography", columnDefinition="VARCHAR(150)")
-    private String biography;
+    @Column(name="biography", columnDefinition="VARCHAR(150) DEFAULT '' NOT NULL")
+    private String biography = "";
 
     @Column(name="email", columnDefinition="VARCHAR(40) NOT NULL UNIQUE")
     private String email;
@@ -56,7 +70,7 @@ public class UserEntity {
     private String verifyEmailToken;
 
     // NOTE: 'TIMESTAMPTZ', the 'Z' at the end lets the column store time-zone info
-    @Column(name="verifyEmailTokenExpires", columnDefinition = "TIMESTAMPTZ")
+    @Column(name="verifyEmailTokenExpires", columnDefinition = "TIMESTAMP")
     private ZonedDateTime verifyEmailTokenExpires;
 
     @Column(name="password", columnDefinition = "CHAR(60) NOT NULL")
@@ -65,10 +79,10 @@ public class UserEntity {
     @Column(name="passwordResetToken", columnDefinition = "CHAR(64)")
     private String passwordResetToken;
 
-    @Column(name="passwordResetTokenExpires", columnDefinition = "TIMESTAMPTZ")
+    @Column(name="passwordResetTokenExpires", columnDefinition = "TIMESTAMP")
     private ZonedDateTime passwordResetTokenExpires;
 
-    @Column(name="createdAt", columnDefinition="TIMESTAMPTZ NOT NULL")
+    @Column(name="createdAt", columnDefinition="TIMESTAMP NOT NULL")
     private ZonedDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
@@ -102,34 +116,3 @@ public class UserEntity {
         return Objects.equals(id, that.id);
     }
 }
-
-
-/**
- * + What is LocalDateTime?
- * Represents a date-time without a timezone. Still in ISO-8601 format though.
- * It's good for storing timestamps when we don't need to track timezones explicitly.
- * So here we store timestamps relative to the server's timezone, which can be
- * configured.
- *
- * + ZonedDatetime:
- * Represents a date-time with a time zone (a ZoneId). As a result we can handle time zone conversions and maintain
- * time zone. Note that when inserting into a 'TIMESTAMP' column. Java's JDBC or JPA libraries handle the
- * conversion of 'ZonedDateTime' to a good 'TIMESTAMP' format with timezone info.
- *
- * We should be aware that if we need to convert timezones into UTC, we'd have to do it
- * programmatically. So here's the procedure:
- *
- * - Database:
- * The TIMESTAMP column will store date-time values including timezone information. So
- * if we insert a date-time value it'll be stored as is, including the timezone offset. So that's good it supports
- * ISO-8601 date strings.
- *
- * - Java App:
- * When we use 'LocalDateTime' it isn't going to store any timezone information. So it assumes
- * date-time is in the server's local time zone.
- *
- * - Handling UTC:
- * To ensure our app will store UTC date-time values in the 'TIMESTAMP' column.
- * Convert LocalDateTime to ZonedDateTime with UTC time zone (ZoneOffset.UTC) before inserting into the database.
- *
- */

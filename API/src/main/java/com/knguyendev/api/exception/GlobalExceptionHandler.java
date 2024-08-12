@@ -2,7 +2,12 @@ package com.knguyendev.api.exception;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,48 +38,57 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Handles 'MethodArgumentNotValidException' exceptions. It should be noted that 'ResponseEntityExceptionHandler'
      * provides its own '@ExceptionHandler' we have to get creative. We can override one of its methods 'handleMethodArgumentNotValid'
-     * and jsut return our own ResponseEntity
-     *
-     * NOTE: This is supposed to inherit? So you should probably test this out before trusting that it works
-     *
+     * and just return our own ResponseEntity
      */
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatus status,
-            WebRequest request) {
-
-        // Create a map to store field errors
+    @Override
+    @Nullable
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             fieldErrors.put(fieldName, errorMessage);
         });
-
-        // Create a custom error response object
         ExceptionDetails exceptionDetails = ExceptionDetails.builder()
-                .message("Validation failed") // General message
+                .message("Input validation failed!")
                 .httpStatus(HttpStatus.BAD_REQUEST)
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                 .fieldErrors(fieldErrors)
                 .build();
-
-        return new ResponseEntity<>(exceptionDetails, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exceptionDetails, exceptionDetails.getHttpStatus());
     }
 
+    // Handles login exceptions
+    @ExceptionHandler(value={UsernameNotFoundException.class, BadCredentialsException.class})
+    public ResponseEntity<ExceptionDetails> handleLoginException(Exception e) {
+        ExceptionDetails exceptionDetails = ExceptionDetails.builder()
+                .message("Username or password is incorrect!")
+                .httpStatus(HttpStatus.UNAUTHORIZED)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
+        return new ResponseEntity<>(exceptionDetails, exceptionDetails.getHttpStatus());
+    }
 
-
-
-    // Handles any 'AuthenticationException' exceptions
+    // Handles 'AuthenticationException' exceptions
     @ExceptionHandler(value = {AuthenticationException.class})
     public ResponseEntity<ExceptionDetails> handleAuthenticationException(AuthenticationException e) {
         ExceptionDetails exceptionDetails = ExceptionDetails.builder()
-                .message(e.getMessage())
+                .message("Authentication Exception: " + e.getMessage())
                 .httpStatus(HttpStatus.UNAUTHORIZED)
                 .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
                 .build();
         return new ResponseEntity<>(exceptionDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    // Handles 'AuthorizationDeniedException' exceptions
+    @ExceptionHandler(value = {AuthorizationDeniedException.class})
+    public ResponseEntity<ExceptionDetails> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        ExceptionDetails exceptionDetails = ExceptionDetails.builder()
+                .message("Access Denied! You don't have the permission to access this resource!")
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .timestamp(ZonedDateTime.now(ZoneId.of("UTC")))
+                .build();
+        return new ResponseEntity<>(exceptionDetails, HttpStatus.FORBIDDEN);
     }
 
     /**
@@ -93,7 +107,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
      * For handling general exceptions
-     *
      * NOTE: Similar ordering to a try/catch, as the more specific error handlers are put on top, whilst the more general
      * ones, such as this one, is on the bottom.
      */

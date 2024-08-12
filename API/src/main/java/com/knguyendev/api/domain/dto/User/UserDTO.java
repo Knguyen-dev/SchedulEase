@@ -1,9 +1,11 @@
 package com.knguyendev.api.domain.dto.User;
+import com.knguyendev.api.enumeration.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * Create a UserDTO:
@@ -25,10 +27,11 @@ import java.time.LocalDateTime;
 public class UserDTO {
     private Long id;
     private String username;
+    private String email;
     private String firstName;
     private String lastName;
     private String biography;
-    private String email;
     private Boolean isVerified;
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
+    private UserRole role;
 }
