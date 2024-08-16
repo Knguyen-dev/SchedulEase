@@ -4,10 +4,12 @@ import com.knguyendev.api.domain.dto.User.UserDTO;
 import com.knguyendev.api.domain.dto.User.UserDetailsImpl;
 import com.knguyendev.api.domain.dto.User.UserLoginDTO;
 import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
+import com.knguyendev.api.domain.entities.TaskListEntity;
 import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.enumeration.UserRole;
 import com.knguyendev.api.exception.ServiceException;
 import com.knguyendev.api.mappers.UserMapper;
+import com.knguyendev.api.repositories.TaskListRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +46,8 @@ public class AuthServiceImpl implements AuthService {
     private int maxSession;
 
     private final UserRepository userRepository;
+    private final TaskListRepository taskListRepository;
+
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
@@ -54,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
 
     public AuthServiceImpl(
             UserRepository userRepository,
+            TaskListRepository taskListRepository,
             UserMapper userMapper,
             PasswordEncoder passwordEncoder,
             AuthenticationManager authManager,
@@ -62,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
             SecurityContextRepository securityContextRepository
     ) {
         this.userRepository = userRepository;
+        this.taskListRepository = taskListRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.authManager = authManager;
@@ -70,6 +76,8 @@ public class AuthServiceImpl implements AuthService {
         this.securityContextRepository = securityContextRepository;
         this.securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
     }
+
+
 
     @Override
     public UserDTO registerUser(UserRegistrationDTO userRegistrationDTO, UserRole role) throws ServiceException {
@@ -92,7 +100,12 @@ public class AuthServiceImpl implements AuthService {
         newUser.setRole(role);
         newUser.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
         newUser.setCreatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
-        return userMapper.toDTO(userRepository.save(newUser));
+
+        // Save the user and create the default task list for said user
+        newUser = userRepository.save(newUser);
+        createDefaultTaskList(newUser.getId());
+
+        return userMapper.toDTO(newUser);
     }
 
     @Override
@@ -141,6 +154,18 @@ public class AuthServiceImpl implements AuthService {
         return userDTO;
     }
 
+
+    private void createDefaultTaskList(Long userId) {
+        TaskListEntity defaultTaskList = TaskListEntity.builder()
+                .userId(userId) // Set the user to the newly saved user
+                .name("My Tasks") // Set a default name or any required fields
+                .isDefault(true) // Mark this task list as default
+                .build();
+
+        taskListRepository.save(defaultTaskList);
+    }
+
+
     /**
      * Method responsible for validating whether the number of sessions for a particular user hasn't been exceeded. If it has, then
      * the oldest valid session is invalidated to maintain order. This is used after we found our user via the UserDetailsService.
@@ -178,7 +203,4 @@ public class AuthServiceImpl implements AuthService {
                     .ifPresent(sessionInfo -> this.redisIndexedSessionRepository.deleteById(sessionInfo.getSessionId()));
         }
     }
-
-
-
 }

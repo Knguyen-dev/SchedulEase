@@ -2,7 +2,6 @@ package com.knguyendev.api.services;
 
 
 import com.knguyendev.api.TestUtil;
-import com.knguyendev.api.domain.dto.User.UserDTO;
 import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
 import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.enumeration.UserRole;

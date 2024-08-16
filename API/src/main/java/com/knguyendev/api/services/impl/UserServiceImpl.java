@@ -5,6 +5,7 @@ import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.enumeration.UserRole;
 import com.knguyendev.api.exception.ServiceException;
 import com.knguyendev.api.mappers.UserMapper;
+import com.knguyendev.api.repositories.TaskListRepository;
 import com.knguyendev.api.repositories.UserRelationshipRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.LogoutService;
@@ -33,6 +34,7 @@ import java.util.stream.StreamSupport;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final TaskListRepository taskListRepository;
     private final UserRelationshipRepository userRelationshipRepository;
     private final UserMapper userMapper;
     private final LogoutService logoutService;
@@ -40,8 +42,9 @@ public class UserServiceImpl implements UserService {
     private final AuthUtils authUtils;
     private final ServiceUtils serviceUtils;
 
-    public UserServiceImpl(UserRepository userRepository, UserRelationshipRepository userRelationshipRepository, LogoutService logoutService, UserMapper userMapper, PasswordEncoder passwordEncoder, AuthUtils authUtils, ServiceUtils serviceUtils) {
+    public UserServiceImpl(UserRepository userRepository, TaskListRepository taskListRepository, UserRelationshipRepository userRelationshipRepository, LogoutService logoutService, UserMapper userMapper, PasswordEncoder passwordEncoder, AuthUtils authUtils, ServiceUtils serviceUtils) {
         this.userRepository = userRepository;
+        this.taskListRepository = taskListRepository;
         this.userRelationshipRepository = userRelationshipRepository;
         this.logoutService = logoutService;
         this.userMapper = userMapper;
@@ -50,16 +53,39 @@ public class UserServiceImpl implements UserService {
         this.serviceUtils = serviceUtils;
     }
 
+    /**
+     * Handles all pieces of logic involving the deletion of a user
+     * <p>
+     * NOTE:
+     * Applying @Transactional directly to the method handling the high-level logic (such as deleteById) ensures that the entire operation, including the calls to inner methods (like deleteUserAndAssociatedData), is executed within a single transaction.
+     * <p>
+     * If @Transactional is placed only on the inner method (deleteUserAndAssociatedData), it may not handle transactions as expected because the calling method (if not transactional) won't support proper transaction management.
+     * @param userId ID of the user being deleted
+     */
+    private void deleteUserAndAssociatedData(Long userId) {
+        // Delete the user
+        userRepository.deleteById(userId);
+
+        // Delete their relationships
+        userRelationshipRepository.deleteByUserId(userId);
+
+        // Delete their taskLists, you'd then do cascading to delete the tasks associated with a taskList.
+        taskListRepository.deleteByUserId(userId);
+    }
+
+    @Override
     public UserDTO findById(Long id)  {
         UserEntity user = serviceUtils.getUserById(id);
         return userMapper.toDTO(user);
     }
 
+    @Override
     public List<UserDTO> findAll() {
         List<UserEntity> users = StreamSupport.stream(userRepository.findAll().spliterator(), false).toList();
         return users.stream().map(userMapper::toDTO).collect(Collectors.toList());
     }
 
+    @Override
     public UserDTO getAuthenticatedUser() {
         Long userId = authUtils.getAuthUserId();
         UserEntity user = serviceUtils.getUserById(userId);
@@ -140,24 +166,23 @@ public class UserServiceImpl implements UserService {
             throw new ServiceException("Password you entered is incorrect, and doesn't match your current password!", HttpStatus.BAD_REQUEST);
         }
 
-        // Password was correct, so delete user from the database and begin logout process
-        // Delete user from the database, logout the user, and convert the deleted user into a DTO
-        userRepository.deleteById(userId);
-
-        // Attempt to then delete all relationships associated with the user?
-        userRelationshipRepository.deleteByUserId(userId);
+        deleteUserAndAssociatedData(userId);
 
         logoutService.logout(request, response);
         return userMapper.toDTO(user);
     }
 
+
+    @Override
+    @Transactional
     public UserDTO deleteById(Long id) throws ServiceException {
         // Prevent the user from deleting their own account; operations like that should be done by deleteAccount() method
-        Long userId = authUtils.getAuthUserId();
-        if (userId.equals(id)) {
+        Long authUserId = authUtils.getAuthUserId();
+        if (authUserId.equals(id)) {
             throw new ServiceException("You can't delete your own account!", HttpStatus.FORBIDDEN);
         }
 
+        // Get the target user being deleted.
         UserEntity user = serviceUtils.getUserById(id);
 
         // If the user being deleted is a 'Super Admin', then stop that request immediately
@@ -170,15 +195,14 @@ public class UserServiceImpl implements UserService {
          * aren't then we'll deny the request
          */
         if (user.getRole() == UserRole.ADMIN) {
-            UserEntity authUser = serviceUtils.getUserById(userId);
+            UserEntity authUser = serviceUtils.getUserById(authUserId);
             if (authUser.getRole() != UserRole.SUPER_ADMIN) {
                 throw new ServiceException("You must be a 'Super Admin' to be able to delete another admin!", HttpStatus.FORBIDDEN);
             }
         }
 
         // Delete the user and any corresponding relationships
-        userRepository.deleteById(id);
-        userRelationshipRepository.deleteByUserId(id);
+        deleteUserAndAssociatedData(user.getId());
 
         return userMapper.toDTO(user);
     }

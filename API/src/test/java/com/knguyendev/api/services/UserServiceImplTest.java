@@ -9,18 +9,18 @@ import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.enumeration.UserRole;
 import com.knguyendev.api.exception.ServiceException;
 import com.knguyendev.api.mappers.UserMapper;
+import com.knguyendev.api.repositories.TaskListRepository;
+import com.knguyendev.api.repositories.UserRelationshipRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.impl.UserServiceImpl;
 import com.knguyendev.api.utils.AuthUtils;
 import com.knguyendev.api.utils.ServiceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,6 +41,11 @@ public class UserServiceImplTest {
     // Mock all outside dependencies that the service uses
     @Mock
     private UserRepository userRepository;
+    @Mock
+    TaskListRepository taskListRepository;
+    @Mock
+    UserRelationshipRepository userRelationshipRepository;
+
     @Mock
     private UserMapper userMapper;
     @Mock
@@ -291,9 +296,7 @@ public class UserServiceImplTest {
         when(serviceUtils.getUserById(authUser.getId())).thenReturn(authUser);
 
         // Act & Assert
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.deleteAccount(request, response, deleteDTO);
-        });
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.deleteAccount(request, response, deleteDTO));
 
         // Assert
         assertEquals("Admins aren't allowed to delete their own accounts! Please get a 'Super Admin' to delete it for you.", exception.getMessage());
@@ -320,9 +323,7 @@ public class UserServiceImplTest {
         when(serviceUtils.getUserById(authUser.getId())).thenReturn(authUser);
 
         // Act & Assert
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.deleteAccount(request, response, deleteDTO);
-        });
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.deleteAccount(request, response, deleteDTO));
 
         // Assert
         assertEquals("Admins aren't allowed to delete their own accounts! Please get a 'Super Admin' to delete it for you.", exception.getMessage());
@@ -348,9 +349,7 @@ public class UserServiceImplTest {
         when(passwordEncoder.matches(deleteDTO.getPassword(), deleteDTO.getConfirmPassword())).thenReturn(false);
 
         // Act & Assert
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.deleteAccount(request, response, deleteDTO);
-        });
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.deleteAccount(request, response, deleteDTO));
 
         // Assert
         assertEquals("Password you entered is incorrect, and doesn't match your current password!", exception.getMessage());
@@ -376,6 +375,8 @@ public class UserServiceImplTest {
         when(authUtils.getAuthUserId()).thenReturn(authUser.getId());
         when(serviceUtils.getUserById(authUser.getId())).thenReturn(authUser);
         when(passwordEncoder.matches(deleteDTO.getPassword(), deleteDTO.getConfirmPassword())).thenReturn(true);
+
+
         when(userMapper.toDTO(authUser)).thenReturn(expectedDTO);
 
         // Act
@@ -384,8 +385,14 @@ public class UserServiceImplTest {
         // Assert and Verify
         assertEquals(expectedDTO, resultDTO);
         verify(userRepository, times(1)).deleteById(authUser.getId());
+        verify(taskListRepository, times(1)).deleteByUserId(authUser.getId());
+        verify(userRelationshipRepository, times(1)).deleteByUserId(authUser.getId());
+
         verify(logoutService, times(1)).logout(any(HttpServletRequest.class), any(HttpServletResponse.class));
         verify(passwordEncoder, times(1)).matches(deleteDTO.getPassword(), deleteDTO.getConfirmPassword());
+
+
+
         verify(userMapper, times(1)).toDTO(authUser);
 
     }
@@ -485,6 +492,9 @@ public class UserServiceImplTest {
 
         assertEquals(expectedDTO, resultDTO);
         verify(serviceUtils, times(1)).getUserById(targetUser.getId());
+        verify(taskListRepository, times(1)).deleteByUserId(targetUser.getId());
+        verify(userRelationshipRepository, times(1)).deleteByUserId(targetUser.getId());
+
         verify(userRepository, times(1)).deleteById(targetUser.getId());
         verify(userMapper, times(1)).toDTO(targetUser);
     }
@@ -500,9 +510,7 @@ public class UserServiceImplTest {
                 .build();
 
         // Act
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.changePassword(request, response, passwordDTO);
-        });
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.changePassword(request, response, passwordDTO));
 
         // Assert and verify: Since exception was called it's safe to assume no other processing happened
         assertEquals("Your new password needs to be different from your current one!", exception.getMessage());
@@ -534,9 +542,7 @@ public class UserServiceImplTest {
                 .thenReturn(false);
 
         // Act
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            userService.changePassword(request, response, passwordDTO);
-        });
+        ServiceException exception = assertThrows(ServiceException.class, () -> userService.changePassword(request, response, passwordDTO));
 
         // Assert and verify: Since exception was called it's safe to assume no other processing happened
         assertEquals("Password you entered is incorrect, and doesn't match your current password!", exception.getMessage());

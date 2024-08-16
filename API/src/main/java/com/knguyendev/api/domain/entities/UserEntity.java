@@ -89,7 +89,6 @@ public class UserEntity implements Serializable {
     @Column(name="role", nullable=false)
     private UserRole role;
 
-
     /**
      * Function for returning the authorities associated with a user
      * @return An immutable set that contains the single authority/role associated with the user.

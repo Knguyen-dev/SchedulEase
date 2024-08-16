@@ -222,6 +222,7 @@ public class UserRelationshipRepositoryIT {
 
         userRepository.save(userA);
         userRepository.save(userB);
+        userRepository.save(userC);
         underTest.save(relationshipAB);
         underTest.save(relationshipAC);
 

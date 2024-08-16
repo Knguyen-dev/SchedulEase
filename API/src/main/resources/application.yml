@@ -82,7 +82,8 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
     # Let hibernate show the sql output
-    show-sql: false
+    show-sql: true
+
     properties:
       hibernate:
         # If we output sql, then format them to be human-readable; useful when 'show-sql' is enabled.

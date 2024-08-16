@@ -11,7 +11,6 @@ import com.knguyendev.api.repositories.UserRelationshipRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.impl.UserRelationshipServiceImpl;
 import com.knguyendev.api.utils.AuthUtils;
-import com.knguyendev.api.utils.ServiceUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

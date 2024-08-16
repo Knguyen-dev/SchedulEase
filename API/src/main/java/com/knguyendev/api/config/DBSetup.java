@@ -122,8 +122,8 @@ public class DBSetup implements ApplicationRunner {
     public void run(ApplicationArguments args) {
 
         // I just won't run these for now. I'll only run them when I want to populate the database
-        loadUsers();
-        loadItemColors();
+//        loadUsers();
+//        loadItemColors();
 
 
     }

@@ -81,7 +81,7 @@ public class UserRelationshipController {
      * GET /relationships - Get all relationships for a given user or the authenticated user
      * So you can have optional query parameters such as 'targetUserId' or 'type'. But if you don't provide the
      * targetUserId, the controller will assume that you're referring to the currently authenticated user. In that
-     * case we will get that user Id from the session and use it. Probably will have a getRelationshipsByUserId() service
+     * case we will get that user ID from the session and use it. Probably will have a getRelationshipsByUserId() service
      * function and a 'getAuthUserRelationship' function that uses the former as a helper function.
      *
      * Nearly every (except the GET '/relationships') controller will provide

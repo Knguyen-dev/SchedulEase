@@ -2,12 +2,14 @@ package com.knguyendev.api;
 
 import com.knguyendev.api.domain.dto.ItemColor.ItemColorCreateDTO;
 import com.knguyendev.api.domain.dto.ItemColor.ItemColorDTO;
+import com.knguyendev.api.domain.dto.TaskList.TaskListDTO;
 import com.knguyendev.api.domain.dto.User.UserDTO;
 import com.knguyendev.api.domain.dto.User.UserDetailsImpl;
 import com.knguyendev.api.domain.dto.User.UserProfileUpdateDTO;
 import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
 import com.knguyendev.api.domain.dto.UserRelationship.UserRelationshipDTO;
 import com.knguyendev.api.domain.entities.ItemColorEntity;
+import com.knguyendev.api.domain.entities.TaskListEntity;
 import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.domain.entities.UserRelationshipEntity;
 import com.knguyendev.api.enumeration.UserRelationshipStatus;
@@ -79,6 +81,17 @@ public class TestUtil {
     private static final Long ITEM_COLOR_B_ID = 2L;
 
 
+    // Constants for 'Task List A'
+    private static final Long TASK_LIST_A_ID = 1L;
+    private static final Long TASK_LIST_A_USERID = 1L;
+    private static final String TASK_LIST_A_NAME = "TaskList A";
+    private static final boolean TASK_LIST_A_ISDEFAULT = false;
+
+    // Constants for 'Task List B'
+    private static final Long TASK_LIST_B_ID = 2L;
+    private static final Long TASK_LIST_B_USERID = 2L;
+    private static final String TASK_LIST_B_NAME = "TaskList B";
+    private static final boolean TASK_LIST_B_ISDEFAULT = true;
 
     private TestUtil() {}
 
@@ -273,7 +286,6 @@ public class TestUtil {
     }
 
     // ***** TestUtil methods for the UserRelationshipEntity
-
     public static UserRelationshipEntity createSavedRelationship(Long id, UserEntity firstUser, UserEntity secondUser, UserRelationshipStatus status) {
         return UserRelationshipEntity.builder()
                 .id(id)
@@ -320,6 +332,49 @@ public class TestUtil {
                  .status(relationship.getStatus())
                  .build();
     }
+
+
+    // ***** TestUtil methods for TaskList
+    public static TaskListEntity createTaskList(Long id, Long userId, String name, boolean isDefault) {
+        return TaskListEntity.builder()
+                .id(id)
+                .userId(userId)
+                .name(name)
+                .isDefault(isDefault)
+                .build();
+    }
+
+    public static TaskListDTO createTaskListDTO(Long id, Long userId, String name, boolean isDefault) {
+        return TaskListDTO.builder()
+                .id(id)
+                .userId(userId)
+                .name(name)
+                .isDefault(isDefault)
+                .build();
+    }
+
+
+
+
+
+    public static TaskListEntity createTaskListA() {
+        return createTaskList(
+                TASK_LIST_A_ID,
+                TASK_LIST_A_USERID,
+                TASK_LIST_A_NAME,
+                TASK_LIST_A_ISDEFAULT
+        );
+    }
+
+    public static TaskListEntity createTaskListB() {
+        return createTaskList(
+                TASK_LIST_B_ID,
+                TASK_LIST_B_USERID,
+                TASK_LIST_B_NAME,
+                TASK_LIST_B_ISDEFAULT
+        );
+    }
+
 
 
 

@@ -295,7 +295,7 @@ public class ItemColorServiceImplTest {
         ItemColorEntity itemColorA = TestUtil.createSavedItemColorA(); // ItemColor being updated
         ItemColorCreateDTO createDTOB = TestUtil.createItemColorCreateDTOB(); // DTO containing ItemColor data we're applying
 
-        // Create the updated version of itemColorA such that itemColorA has createDTOB's data
+        // Create the updated version of itemColorA such that itemColorA has DTO B's data
         ItemColorEntity updatedItemColorA = TestUtil.createSavedItemColorA();
         updatedItemColorA.setName(createDTOB.getName());
         updatedItemColorA.setHexCode(createDTOB.getHexCode());
