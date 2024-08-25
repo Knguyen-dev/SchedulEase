@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,25 +16,37 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "TaskList")
 public class TaskListEntity {
+
+    // Unique identifier for a task list
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
+    // ID of the user that created and owns the task list
     @Column(name="userId", nullable = false)
     private Long userId;
 
+    // Name of the task list; think of it as the title
     @Column(name="name", columnDefinition="VARCHAR(100) NOT NULL")
     private String name;
 
+    // Whether the task list is the default one that every user should have.
     @Column(name="isDefault", columnDefinition="BOOLEAN NOT NULL DEFAULT FALSE")
     boolean isDefault = false;
+
+
+
+
+    // Note: The `addTask` and `removeTask` methods are not strictly necessary for JPA to function correctly,
+    // but they are useful for maintaining bidirectional consistency in the relationship. However, for our use case,
+    // we are not using these methods because adding and removing tasks involves complex logic such as managing
+    // task ordering within the task list. This complexity is handled by service functions rather than directly
+    // through the entity methods.
+
+    // Service functions will manage task ordering and other related operations, while entity methods would
+    // only handle basic bidirectional consistency. This approach helps to keep the entity logic simpler and
+    // delegates complex operations to the appropriate service layer.
+
+    // In the future, if we encounter issues or need to simplify task management, we might revisit adding these
+    // methods or implementing similar logic in the entity itself.
 }
-
-
-/**
- * Storing as a userId because we don't need the entire entity for our operations. And doing that multiple times for
- * many task lists would be dreadful. The only downside is that we'll probably have to execute multiple repository
- * methods for deleting, but that's pretty manageable:
- * 1. If user is deleted, we'll delete the corresponding TaskList rows. (a user can have many taskLists)
- * 2. If TaskList is deleted, we'll delete the corresponding Task rows. (a tasklist can have many tasks)
- */

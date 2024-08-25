@@ -1,6 +1,7 @@
 package com.knguyendev.api.repositories;
 
 import com.knguyendev.api.TestUtil;
+import com.knguyendev.api.domain.entities.TaskEntity;
 import com.knguyendev.api.domain.entities.TaskListEntity;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TaskListRepositoryIT {
 
+    private final TaskRepository taskRepository;
     private final TaskListRepository underTest;
     @Autowired
-    public TaskListRepositoryIT(TaskListRepository underTest) {
+    public TaskListRepositoryIT(TaskRepository taskRepository, TaskListRepository underTest) {
+        this.taskRepository = taskRepository;
         this.underTest = underTest;
     }
 
@@ -106,11 +109,4 @@ public class TaskListRepositoryIT {
         assertThat(taskLists)
                 .hasSize(0);
     }
-
-
-
-
-
-
-
 }

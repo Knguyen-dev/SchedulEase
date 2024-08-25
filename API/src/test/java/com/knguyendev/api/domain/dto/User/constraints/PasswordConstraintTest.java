@@ -63,8 +63,8 @@ public class PasswordConstraintTest {
                 "12398773",           // Numbers only (no letters or symbols)
                 "!@#$%^&*",         // symbols only (no letters or numbers)
                 "My B4#nd number",    // Contains whitespace (whitespace isn't allowed),
-                "P4ssword",           // Upper and lowercased letters, and numbers. However it doesn't have special character which should make it fail
-                "38%*82#@029",       // Numbers and special characters only; no letters so it should fail
+                "P4ssword",           // Upper and lowercased letters, and numbers. However, it doesn't have special character which should make it fail
+                "38%*82#@029",       // Numbers and special characters only; no letters, so it should fail
                 "$ec&re#eiId"       // Special characters and upper and lower letters.
         };
         for (String password: invalidPasswords) {

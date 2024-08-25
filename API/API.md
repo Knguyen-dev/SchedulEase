@@ -2,6 +2,13 @@
 
 
 
+## Todos
+- Our taskList now needs to include any associated tasks so be sure to update the taskListMapper and the TaskListServiceImpl
+- We need to create a TaskServiceImpl and a TaskMapperImpl.
+- Design and create the TaskDTO and TaskMapperImpl
+
+- We updated the implementation so now we may need to test the delete user.
+- Should probably test the findUserTaskList functions so that it correctly finds the tasks with or without the tasks
 
 ## Issues and considerations
 - Regardless we always get a "BadCredentialsException", but never a "UsernameNotFoundException". I'm seeing a pattern. All the errors related to AuthenticationException are not being caught by our handler in ControllerAdvices. The BadCredentialsException, the InsufficientAuthenticationException. Also, 'AuthorizationDeniedException' is redirected to the handleGlobalException method. Granted it isn't inherited from 
@@ -9,8 +16,9 @@
 - Session timeout error. We aren't able to set the session timeout. It's always at 30minutes even though we're modifying the 'server.servlet.session.timeout' property. So that need to be changed. Make sure ttl is also controlled and fine-grained.
 - Currently not using the in-memory for testing, which kind of sucks. Maybe later we'll be able to have this and redis. So right now in order to do integration tests, you have to have the docker and redis containers running.
 
-- Running integration tests for repositories will run the entire app. That's why it's an integration test. So just know that
 - Role annotations: You can create custom role annotations to make things a little more maintainable.
+- Deleting user and associated data isn't working. 
+
 
 
 ## Notes
@@ -57,8 +65,6 @@ So let's access the value of `"spring:session:sessions:9fc78581-3075-486b-8eb4-d
 ```
 Remember that the data stored in the redis is just the Spring Security Context for that particular login
 
-
-
 - NOTE: Do `ctrl + shift + c` and `ctrl + shift + v`. For copying and pasting in bash
 
 
@@ -74,7 +80,7 @@ Remember that the data stored in the redis is just the Spring Security Context f
 3. \dt
 
 [//]: # (Do a query on a table)
-4. SELECT * FROM appUser
+4. SELECT * FROM appUser;
 
 ```
 # Credits:
@@ -82,3 +88,11 @@ Remember that the data stored in the redis is just the Spring Security Context f
 2. [Handling deleting cookies from a response](https://stackoverflow.com/questions/890935/how-do-you-remove-a-cookie-in-a-java-servlet)
 3. [Roles and Privileges in Spring Security](https://www.baeldung.com/role-and-privilege-for-spring-security-registration)
 
+
+## UI Inspiration
+Here's some UI Inspiration if you don't want to follow the google calendar design for some reason. Though these are more 
+so project management designs. Though I think we're probably going to stick with google calendar if I'm being real
+1. https://www.behance.net/gallery/199866937/App-for-task-management-using-kanban-boards?tracking_source=search_projects|task+app&l=15
+2. https://www.behance.net/gallery/199866937/App-for-task-management-using-kanban-boards?tracking_source=search_projects|task+app&l=15
+3. https://www.behance.net/gallery/188384331/Flows-App-Task-and-Project-Management?tracking_source=search_projects|task+app&l=12
+4. https://www.behance.net/gallery/188698010/OfficeSphere-Virtual-Office-Management-Dashboard?tracking_source=search_projects|task+app&l=36

@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
-    private static ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    private static Validator validator = factory.getValidator();
+    private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    private static final Validator validator = factory.getValidator();
 
     public static <T> void validate(T object) throws IllegalArgumentException {
         Set<ConstraintViolation<T>> violations = validator.validate(object);

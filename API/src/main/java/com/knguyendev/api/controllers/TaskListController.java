@@ -89,31 +89,3 @@ public class TaskListController {
         return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 }
-/*
- * Some apis
- *
- * + Create a new taskList; this wouldn't be a default taskList. I guess this would create
- * a taskList for the currently authenticated user, so we'll rely on the backend to get that from session data
- * You'd pass in the TaskListRequest 'DTO' for creating it
- * POST "/taskLists"
- *
- * + Update an existing taskList; So this would update an existing taskList. Since taskList has a
- * primary key you could just pass that in as a route parameter. You'd still pass in the 'TaskListRequest'
- * DTO. The only thing you have to worry about is making sure that if there does exist a taskList with that 'id',
- * does it belong to the currently authenticated user? If yes, then they're modifying their own taskList, else no and reject
- * the request since other users can't mess with your own taskList.
- * PUT "/taskList/${id}"
- *
- * + Delete an existing taskList; By standards it's probably going to be a two query thing such that we make sure that
- * the taskList exists before deleting it. That aligns with the patterns we already do. Then of course the idea would be
- * to make sure that the authenticated user owns the taskList, which is our way of making sure if they're allowed to delete it.
- * DELETE "/taskList/${id}
- *
- *
- * + Get all task lists associated with a user. More specifically the authenticated user
- * In this, our service will probably include the related tasks associated with them, but we'll
- * handle that later. I don't really see us getting the taskLists without the individual tasks themselves
- * so yeah. I think it's fine to do GET "/taskLists" and only return the taskLists associated with the authenticated
- * user., as this is a protected route as well. I think the main issue is deciding whether to include the tasks
- * with the taskList, I guess for flexibility, for now I think we should have a query parameter that decides whether     *  to include the tasks.
- */

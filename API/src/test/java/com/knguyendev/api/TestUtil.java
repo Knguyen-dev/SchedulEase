@@ -297,7 +297,7 @@ public class TestUtil {
 
     /**
      * Creates a DTO version of the UserRelationshipEntity.
-     *
+     * <p>
      * NOTE: It could be a little better if we somehow use the actual userMapper
      */
     public static UserRelationshipDTO createRelationshipDTO(UserRelationshipEntity relationship) {

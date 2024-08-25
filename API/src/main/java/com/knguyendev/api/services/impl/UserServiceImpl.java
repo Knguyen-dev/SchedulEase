@@ -6,6 +6,7 @@ import com.knguyendev.api.enumeration.UserRole;
 import com.knguyendev.api.exception.ServiceException;
 import com.knguyendev.api.mappers.UserMapper;
 import com.knguyendev.api.repositories.TaskListRepository;
+import com.knguyendev.api.repositories.TaskRepository;
 import com.knguyendev.api.repositories.UserRelationshipRepository;
 import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.LogoutService;
@@ -27,7 +28,7 @@ import java.util.stream.StreamSupport;
 /**
  * Create a class that implements the UserService interface. So this class actually contains the implementation and code
  * for the methods and whatnot.
- *
+ * <p>
  *
  * NOTE: Now you need to include the deletion of UserRelationships when a User themselves is deleted
  */
@@ -35,6 +36,8 @@ import java.util.stream.StreamSupport;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TaskListRepository taskListRepository;
+    private final TaskRepository taskRepository;
+
     private final UserRelationshipRepository userRelationshipRepository;
     private final UserMapper userMapper;
     private final LogoutService logoutService;
@@ -42,9 +45,10 @@ public class UserServiceImpl implements UserService {
     private final AuthUtils authUtils;
     private final ServiceUtils serviceUtils;
 
-    public UserServiceImpl(UserRepository userRepository, TaskListRepository taskListRepository, UserRelationshipRepository userRelationshipRepository, LogoutService logoutService, UserMapper userMapper, PasswordEncoder passwordEncoder, AuthUtils authUtils, ServiceUtils serviceUtils) {
+    public UserServiceImpl(UserRepository userRepository, TaskListRepository taskListRepository, TaskRepository taskRepository, UserRelationshipRepository userRelationshipRepository, LogoutService logoutService, UserMapper userMapper, PasswordEncoder passwordEncoder, AuthUtils authUtils, ServiceUtils serviceUtils) {
         this.userRepository = userRepository;
         this.taskListRepository = taskListRepository;
+        this.taskRepository = taskRepository;
         this.userRelationshipRepository = userRelationshipRepository;
         this.logoutService = logoutService;
         this.userMapper = userMapper;
@@ -69,7 +73,10 @@ public class UserServiceImpl implements UserService {
         // Delete their relationships
         userRelationshipRepository.deleteByUserId(userId);
 
-        // Delete their taskLists, you'd then do cascading to delete the tasks associated with a taskList.
+        // Delete the tasks first
+        taskRepository.deleteByUserId(userId);
+
+        // Delete then delete the task lists
         taskListRepository.deleteByUserId(userId);
     }
 

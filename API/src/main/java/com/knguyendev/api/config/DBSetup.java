@@ -1,15 +1,34 @@
 package com.knguyendev.api.config;
 
 import com.knguyendev.api.domain.dto.ItemColor.ItemColorCreateDTO;
+import com.knguyendev.api.domain.dto.Task.TaskCreateRequest;
+import com.knguyendev.api.domain.dto.TaskList.TaskListDTO;
+import com.knguyendev.api.domain.dto.TaskList.TaskListRequest;
+import com.knguyendev.api.domain.dto.User.UserDTO;
 import com.knguyendev.api.domain.dto.User.UserRegistrationDTO;
+import com.knguyendev.api.domain.entities.ItemColorEntity;
+import com.knguyendev.api.domain.entities.TaskEntity;
+import com.knguyendev.api.domain.entities.TaskListEntity;
+import com.knguyendev.api.domain.entities.UserEntity;
 import com.knguyendev.api.enumeration.UserRole;
+import com.knguyendev.api.repositories.ItemColorRepository;
+import com.knguyendev.api.repositories.TaskListRepository;
+import com.knguyendev.api.repositories.TaskRepository;
+import com.knguyendev.api.repositories.UserRepository;
 import com.knguyendev.api.services.AuthService;
 import com.knguyendev.api.services.ItemColorService;
+import com.knguyendev.api.services.TaskListService;
+import com.knguyendev.api.services.TaskService;
 import com.knguyendev.api.utils.ValidationUtil;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,113 +37,187 @@ import java.util.Map;
 // Don't want this setup function running and affecting my integration or unit tests though
 @Component
 public class DBSetup implements ApplicationRunner {
-
-    private final ItemColorService itemColorService;
-    private final AuthService authService;
-
-    public DBSetup(ItemColorService itemColorService, AuthService authService) {
-        this.itemColorService = itemColorService;
-        this.authService = authService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final TaskListRepository taskListRepository;
+    private final TaskRepository taskRepository;
+    private final ItemColorRepository itemColorRepository;
+    public DBSetup(PasswordEncoder passwordEncoder, UserRepository userRepository, TaskListRepository taskListRepository, TaskRepository taskRepository, ItemColorRepository itemColorRepository, ItemColorService itemColorService) {
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.taskListRepository = taskListRepository;
+        this.taskRepository = taskRepository;
+        this.itemColorRepository = itemColorRepository;
     }
+
+
+    private UserEntity createUserEntity(Long id, String username, String email, String firstName, String lastName, String biography, Boolean isVerified, String plainTextPassword, ZonedDateTime createdAt, UserRole role) {
+        String encodedPassword = passwordEncoder.encode(plainTextPassword);
+        return UserEntity.builder()
+                .id(id)
+                .username(username)
+                .email(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                .biography(biography)
+                .isVerified(isVerified)
+                .password(encodedPassword)
+                .createdAt(createdAt)
+                .role(role)
+                .build();
+    }
+
+    private UserEntity createUserA() {
+        // Sample data for the first user
+        Long USER_ID = 1L;
+        String USER_USERNAME = "knguyen44";
+        String USER_EMAIL = "knguyen44@gmail.com";
+        String USER_FIRST_NAME = "Kevin";
+        String USER_LAST_NAME = "Nguyen";
+        String USER_BIOGRAPHY = "Hi I'm a content creator on Youtube and sometimes I stream on Twitch";
+        Boolean USER_IS_VERIFIED = true;
+        String USER_PASSWORD = "P$ssword_123";
+        ZonedDateTime USER_CREATED_AT = ZonedDateTime.now(ZoneId.of("UTC"));
+        UserRole USER_ROLE = UserRole.SUPER_ADMIN;
+        return createUserEntity(
+                USER_ID,
+                USER_USERNAME,
+                USER_EMAIL,
+                USER_FIRST_NAME,
+                USER_LAST_NAME,
+                USER_BIOGRAPHY,
+                USER_IS_VERIFIED,
+                USER_PASSWORD,
+                USER_CREATED_AT,
+                USER_ROLE
+        );
+    }
+
+    private UserEntity createUserB() {
+        // Sample data for the second user
+        Long USER_ID = 2L;
+        String USER_USERNAME = "kbizzzyy";
+        String USER_EMAIL = "kbizzzyy@gmail.com";
+        String USER_FIRST_NAME = "Kon";
+        String USER_LAST_NAME = "Sempton";
+        String USER_BIOGRAPHY = "Hi someone that's doing a lot of stuff";
+        Boolean USER_IS_VERIFIED = true;
+        String USER_PASSWORD = "P$ssword_123";
+        ZonedDateTime USER_CREATED_AT = ZonedDateTime.now(ZoneId.of("UTC"));
+        UserRole USER_ROLE = UserRole.ADMIN;
+        return createUserEntity(
+                USER_ID,
+                USER_USERNAME,
+                USER_EMAIL,
+                USER_FIRST_NAME,
+                USER_LAST_NAME,
+                USER_BIOGRAPHY,
+                USER_IS_VERIFIED,
+                USER_PASSWORD,
+                USER_CREATED_AT,
+                USER_ROLE
+        );
+    }
+
+    private TaskListEntity createTaskListEntity(Long id, Long userId, String name, boolean isDefault) {
+        return TaskListEntity.builder()
+                .id(id)
+                .userId(userId)
+                .name(name)
+                .isDefault(isDefault)
+                .build();
+    }
+
+    private TaskListEntity createTaskListA() {
+        Long id = 1L;
+        Long userId = createUserA().getId();
+        String name = "My Task List";
+        boolean isDefault = true;
+        return createTaskListEntity(id, userId, name, isDefault);
+    }
+
+    private TaskListEntity createTaskListB() {
+        Long id = 2L;
+        Long userId = createUserB().getId();
+        String name = "My Task List";
+        boolean isDefault = true;
+        return createTaskListEntity(id, userId, name, isDefault);
+    }
+
 
     public void loadUsers() {
-        List<UserRegistrationDTO> registrations = List.of(
-                UserRegistrationDTO.builder()
-                        .username("knguyen44")
-                        .email("knguyen44@gmail.com")
-                        .firstName("Kevin")
-                        .lastName("Nguyen")
-                        .password("P$ssword_123")
-                        .build(),
-                UserRegistrationDTO.builder()
-                        .username("KbizzzyyCentral")
-                        .email("KbizzzyyCentral@gmail.com")
-                        .firstName("Kevin")
-                        .lastName("Nguyen")
-                        .password("P$ssword_123")
-                        .build(),
-                UserRegistrationDTO.builder()
-                        .username("SkyKbean")
-                        .email("SkyKbean@gmail.com")
-                        .firstName("Skylar")
-                        .lastName("Johnson")
-                        .password("P$ssword_123")
-                        .build()
+        List<UserEntity> users = List.of(
+                createUserA(),
+                createUserB()
         );
-        List<UserRole> roles = List.of(
-                UserRole.SUPER_ADMIN,
-                UserRole.ADMIN,
-                UserRole.USER
-        );
-
-        // Iterate via index to process each registration with its corresponding role
-        for (int i = 0; i < registrations.size(); i++) {
-            UserRegistrationDTO registration = registrations.get(i);
-            UserRole role = roles.get(i);
-
-            try {
-                // Manually validate the user registration DTO
-                ValidationUtil.validate(registration);
-
-                // Normalize the data
-                registration.normalizeData();
-
-                // Register the user with the corresponding role
-                authService.registerUser(registration, role);
-            } catch (Exception e) {
-                System.err.println("Error registering user '" + registration.getUsername() + "': " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
+        userRepository.saveAll(users);
     }
 
+    public void loadTaskListsAndTasks() {
+        TaskListEntity taskListA = createTaskListA();
+        TaskListEntity taskListB = createTaskListB();
+        taskListRepository.saveAll(List.of(
+                taskListA,
+                taskListB
+        ));
+
+
+    }
 
     public void loadItemColors() {
 
-        Map<String, String> colorMap = new HashMap<>();
-
-        // Adding Google Calendar colors to the map
-        colorMap.put("Flamingo", "#f28b82");
-        colorMap.put("Tomato", "#fbbc05");
-        colorMap.put("Banana", "#fff475");
-        colorMap.put("Tangerine", "#ffab91");
-        colorMap.put("Peacock", "#aecbfa");
-        colorMap.put("Graphite", "#e6c9ff");
-        colorMap.put("Blueberry", "#d7aaff");
-        colorMap.put("Basil", "#fdcfe8");
-
-        for (String colorName : colorMap.keySet()) {
-            ItemColorCreateDTO createItemColor = ItemColorCreateDTO.builder()
-                    .name(colorName)
-                    .hexCode(colorMap.get(colorName))
-                    .build();
-
-            try {
-                // Manually validate
-                ValidationUtil.validate(createItemColor);
-
-                // Normalize the data
-                createItemColor.normalizeData();
-
-                // Call service function
-                itemColorService.create(createItemColor);
-            } catch (IllegalArgumentException e) {
-                System.err.println("Validation failed for color '" + colorName + "': " + e.getMessage());
-            } catch (Exception e) {
-                System.err.println("Error creating item color '" + colorName + "': " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
+        List<ItemColorEntity> itemColors = List.of(
+                ItemColorEntity.builder()
+                        .id(1L)
+                        .name("Flamingo")
+                        .hexCode("#f28b82")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(2L)
+                        .name("Tomato")
+                        .hexCode("#fbbc05")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(3L)
+                        .name("Banana")
+                        .hexCode("#fff475")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(4L)
+                        .name("Tangerine")
+                        .hexCode("#ffab91")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(5L)
+                        .name("Peacock")
+                        .hexCode("#aecbfa")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(6L)
+                        .name("Graphite")
+                        .hexCode("#e6c9ff")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(7L)
+                        .name("Blueberry")
+                        .hexCode("#d7aaff")
+                        .build(),
+                ItemColorEntity.builder()
+                        .id(8L)
+                        .name("Basil")
+                        .hexCode("#fdcfe8")
+                        .build()
+        );
+        itemColorRepository.saveAll(itemColors);
     }
 
     // Is this going to run after it gets its dependencies?
     @Override
     public void run(ApplicationArguments args) {
-
         // I just won't run these for now. I'll only run them when I want to populate the database
-//        loadUsers();
+
+        loadUsers();
+        loadTaskListsAndTasks();
 //        loadItemColors();
-
-
     }
 }

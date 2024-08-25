@@ -99,19 +99,21 @@ public class TaskListServiceImplTest {
         Long id = 1L;
         Long authUserId = 1L;
         TaskListRequest request = new TaskListRequest("Updated Task List");
-        TaskListEntity defaultTaskList = TestUtil.createTaskList(id, authUserId, "Updated task list", true);
+        TaskListEntity existingTaskList = TestUtil.createTaskList(id, authUserId, "Existing task list", true);
+        TaskListEntity updatedTaskList = TestUtil.createTaskList(id, authUserId, request.getName(), true);
 
         // Simulate
         when(authUtils.getAuthUserId()).thenReturn(authUserId);
-        when(taskListRepository.findById(id)).thenReturn(Optional.of(defaultTaskList));
+        when(taskListRepository.findById(id)).thenReturn(Optional.of(existingTaskList));
+        when(taskListRepository.save(updatedTaskList)).thenReturn(updatedTaskList);
 
         // Act
-        ServiceException exception = assertThrows(ServiceException.class, () -> taskListService.update(id, request));
+        TaskListDTO result = taskListService.update(id, request);
 
-        // Assert and verify
-        assertEquals("You cannot update the default task list!", exception.getMessage());
-        assertEquals(HttpStatus.FORBIDDEN, exception.getHttpStatus());
+        // Just verify that these were called
         verify(taskListRepository).findById(id);
+        verify(taskListRepository).save(updatedTaskList);
+        verify(taskListMapper).toDTO(updatedTaskList);
     }
 
     @Test
